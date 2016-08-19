@@ -189,7 +189,7 @@ The **clear** method takes a optional configuration object as an argument. It ha
 
 ```sh
 {
-    String namespace
+    [String namespace]
 }
 ```
 
