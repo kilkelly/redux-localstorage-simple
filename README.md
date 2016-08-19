@@ -48,10 +48,12 @@ See the Usage Example above to get a better idea of how this works.
 The **save** method takes a optional configuration object as an argument. It has the following properties:
 ```sh
 {
-    [Array states]
+    [Array states],
+    String namespace
 }
 ```
 - states - This is an optional array of strings specifying which parts of the Redux state tree you would like to save to LocalStorage. e.g. ["user", "products"]. Typically states have identical names to your Redux reducers. If you do not specify any states then your entire Redux state tree will be saved to LocalStorage.
+- namespace - This is an optional string specifying the namespace to add before your LocalStorage items. For example if you have a part of your Redux state tree called "user" and you specify the namespace "my_cool_app", it will be saved to LocalStorage as "my_cool_app_user"
 
 ##### Examples
 
@@ -62,6 +64,17 @@ save()
 ```sh
 // save specific parts of the state tree
 save({ states: ["user", "products"] })
+```
+```sh
+// save the entire state tree under the namespace "my_cool_app". The key "my_cool_app" will appear in LocalStorage
+save({ namespace: "my_cool_app" })
+```
+```sh
+// save specific parts of the state tree with the namespace "my_cool_app". The keys "my_cool_app_user" and "my_cool_app_products" will appear in LocalStorage
+save({
+    states: ["user", "products"],
+    namespace: "my_cool_app"
+})
 ```
 .
 #### load([object config])
@@ -76,11 +89,12 @@ The **load** method takes a optional configuration object as an argument. It has
 ```sh
 {
     [Array states],
-    [Boolean immutablejs]
+    Boolean immutablejs,
+    String namespace
 }
 ```
-- states (array of strings, optional) - This is an optional array of strings specifying which parts of the Redux state tree you would like to load from LocalStorage. e.g. ["user", "products"]. These parts of the state tree must have been previously saved using the **save** method. Typically states have identical names to your Redux reducers. If you do not specify any states then your entire Redux state tree will be loaded from LocalStorage.
-
+- states - This is an optional array of strings specifying which parts of the Redux state tree you would like to load from LocalStorage. e.g. ["user", "products"]. These parts of the state tree must have been previously saved using the **save** method. Typically states have identical names to your Redux reducers. If you do not specify any states then your entire Redux state tree will be loaded from LocalStorage.
+- namespace - If you have saved your entire state tree or parts of your state tree under a namespace you will need to specify it in order to load it from LocalStorage.
 - immutablejs (boolean, optional) - If the parts of the state tree you are loading use [Immutable.js](https://facebook.github.io/immutable-js/) data structures set this property to true or else they won't be handled correctly.
 
 
@@ -95,10 +109,21 @@ load()
 load({ states: ["user", "products"] })
 ```
 ```sh
+// load the entire state tree which was previously saved with the namespace "my_cool_app"
+load({ namespace: "my_cool_app" })
+```
+```sh
 // load specific parts of the state tree which use Immutable.js data structures
 load({ 
     states: ["user", "products"],
     immutablejs: true
+})
+```
+```sh
+// load specific parts of the state tree which was previously saved with the namespace "my_cool_app"
+load({ 
+    states: ["user", "products"],
+    namespace: "my_cool_app"
 })
 ```
 .
@@ -117,9 +142,24 @@ combineLoads(
 .
 #### clear()
 Clears all Redux state tree data from LocalStorage. Note: only clears data which was saved using this module's functionality
+##### Arguments
+The **clear** method takes a optional configuration object as an argument. It has the following properties:
+```sh
+{
+    String namespace
+}
+```
+- namespace - If you have saved your entire state tree or parts of your state tree under a namespace you will need to specify it in order to clear that data from LocalStorage.
 ##### Examples
 ```sh
-clear() 
+// clear all Redux state tree data saved without a namespace
+clear()
+```
+```sh
+// clear Redux state tree data saved with a namespace
+clear({
+    namespace: "my_cool_app"
+})  
 ```
 ### Feedback
 Pull requests and opened issues are welcome!
