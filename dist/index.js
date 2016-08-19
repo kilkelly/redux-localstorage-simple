@@ -23,14 +23,28 @@ var NAMESPACE_DEFAULT = "redux_localstorage_simple";
 
 						Properties:
 							states (Array of Strings, optional) - States to save e.g. ["user", "products"]						
-							namespace (String, optional) - Namespace to prepend your LocalStorage items
+							namespace (String, optional) - Namespace to add before your LocalStorage items
 
-	Usage example:
-	
+	Usage examples:
+
+		// save entire state tree - EASIEST OPTION
+		save()
+
+		// save specific parts of the state tree
+		save({ 
+			states: ["user", "products"]
+		})		
+
+		// save the entire state tree under the namespace "my_cool_app". The key "my_cool_app" will appear in LocalStorage
 		save({
-			states: ["user", "products"],
 			namespace: "my_cool_app"
-		}) 	
+		})
+	
+		// save specific parts of the state tree with the namespace "my_cool_app". The keys "my_cool_app_user" and "my_cool_app_products" will appear in LocalStorage
+		save({
+		    states: ["user", "products"],
+		    namespace: "my_cool_app"
+		})
 */
 
 function save() {
@@ -74,23 +88,31 @@ function save() {
 							immutablejs (Boolean, optional) - If dealing with Immutable.js data structures, set this to true to load them correctly
 
 	Usage examples:
-	
-		// load previously saved parts of state tree
+			
+		// load entire state tree - EASIEST OPTION
+		load()
+
+		// load specific parts of the state tree
 		load({
 			states: ["user", "products"]
 		})
 
-		// load previously saved parts of state tree which were initially saved under the namespace "my_cool_app"
+		// load the entire state tree which was previously saved with the namespace "my_cool_app"
 		load({
-			states: ["user", "products"],
 			namespace: "my_cool_app"
-		})		 	
+		})
 
-		// load previously saved parts of state tree which use Immutable.js data structures
-		load({
-			states: ["user", "products"],
-			immutablejs: true
-		}) 			
+		// load specific parts of the state tree which use Immutable.js data structures
+		load({ 
+		    states: ["user", "products"],
+		    immutablejs: true
+		})
+
+		// load specific parts of the state tree which was previously saved with the namespace "my_cool_app"
+		load({ 
+		    states: ["user", "products"],
+		    namespace: "my_cool_app"
+		})
 
 */
 
@@ -109,7 +131,6 @@ function load() {
 
 	if (states.length === 0) {
 
-		// does default localstorage token exist?
 		if (localStorage[namespace]) {
 			loadedState = JSON.parse(localStorage[namespace]);
 
@@ -149,6 +170,7 @@ function load() {
 
 	Usage example:
 
+		// load both vanilla JavaScript and Immutable.js parts of the state tree from LocalStorage
 		combineLoads( 
 			load({ states: ["user"] }), // loading normal object
 			load({ states: ["products"], immutablejs: true ) // this part of the state tree is an Immutable.js structure
@@ -180,7 +202,7 @@ function combineLoads() {
 	----------		
 	@config (Object) - 	Contains configuration options (leave blank to clear entire state tree from LocalStorage, if it was saved without a namespace)
 						Properties:
-							namespace (String, optional) - Namespace that you used during the save proces
+							namespace (String, optional) - Namespace that you used during the save process
 
 	Usage example:
 
