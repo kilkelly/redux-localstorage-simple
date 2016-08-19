@@ -175,6 +175,12 @@ function load() {
 			load({ states: ["user"] }), // loading normal object
 			load({ states: ["products"], immutablejs: true ) // this part of the state tree is an Immutable.js structure
 		)	
+
+		// Load parts of the state tree saved with different namespaces
+		combineLoads( 
+		    load({ states: ["user"], namespace: "account_stuff" }),
+		    load({ states: ["products", "categories"], namespace: "site_stuff" )
+		)   		
 */
 
 function combineLoads() {
