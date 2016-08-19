@@ -58,19 +58,25 @@ The **save** method takes a optional configuration object as an argument. It has
 ##### Examples
 
 ```sh
-// save entire state tree
+// Save entire state tree
 save()
 ```
 ```sh
-// save specific parts of the state tree
+// Save specific parts of the state tree
 save({ states: ["user", "products"] })
 ```
 ```sh
-// save the entire state tree under the namespace "my_cool_app". The key "my_cool_app" will appear in LocalStorage
+/*
+    Save the entire state tree under the namespace "my_cool_app".
+    The key "my_cool_app" will appear in LocalStorage 
+*/
 save({ namespace: "my_cool_app" })
 ```
 ```sh
-// save specific parts of the state tree with the namespace "my_cool_app". The keys "my_cool_app_user" and "my_cool_app_products" will appear in LocalStorage
+/*
+    Save specific parts of the state tree with the namespace "my_cool_app".
+    The keys "my_cool_app_user" and "my_cool_app_products" will appear in LocalStorage
+*/
 save({
     states: ["user", "products"],
     namespace: "my_cool_app"
@@ -101,26 +107,29 @@ The **load** method takes a optional configuration object as an argument. It has
 ##### Examples
 
 ```sh
-// load entire state tree
+// Load entire state tree
 load()
 ```
 ```sh
-// load specific parts of the state tree
+// Load specific parts of the state tree
 load({ states: ["user", "products"] })
 ```
 ```sh
-// load the entire state tree which was previously saved with the namespace "my_cool_app"
+// Load the entire state tree which was previously saved with the namespace "my_cool_app"
 load({ namespace: "my_cool_app" })
 ```
 ```sh
-// load specific parts of the state tree which use Immutable.js data structures
+// Load specific parts of the state tree which use Immutable.js data structures
 load({ 
     states: ["user", "products"],
     immutablejs: true
 })
 ```
 ```sh
-// load specific parts of the state tree which was previously saved with the namespace "my_cool_app"
+/*
+    Load specific parts of the state tree which was previously saved with 
+    the namespace "my_cool_app"
+*/
 load({ 
     states: ["user", "products"],
     namespace: "my_cool_app"
@@ -133,7 +142,7 @@ If your state tree is a mixture of vanilla JavaScript objects and Immutable.js d
 - loads - This method takes any number of **load** methods, with each load handling a different part of the state tree. This is best described by viewing the following examples...
 ##### Examples
 ```sh
-// load both vanilla JavaScript and Immutable.js parts of the state tree from LocalStorage
+// Load both vanilla JavaScript and Immutable.js parts of the state tree from LocalStorage
 combineLoads( 
     load({ states: ["user", "categories"] }),
     load({ states: ["products"], immutablejs: true )
@@ -152,11 +161,11 @@ The **clear** method takes a optional configuration object as an argument. It ha
 - namespace - If you have saved your entire state tree or parts of your state tree under a namespace you will need to specify it in order to clear that data from LocalStorage.
 ##### Examples
 ```sh
-// clear all Redux state tree data saved without a namespace
+// Clear all Redux state tree data saved without a namespace
 clear()
 ```
 ```sh
-// clear Redux state tree data saved with a namespace
+// Clear Redux state tree data saved with a namespace
 clear({
     namespace: "my_cool_app"
 })  
