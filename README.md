@@ -38,7 +38,7 @@ const store = createStoreWithMiddleware(
 
 ## API
 
-### save([object config])
+### save([Object config])
 
 Saving to LocalStorage is achieved using [Redux middleware](http://redux.js.org/docs/advanced/Middleware.html) and saves each time an action is handled by your reducer. You will need to pass the **save** method into Redux's **applyMiddleware** method, like so...
 
@@ -63,37 +63,34 @@ The **save** method takes a optional configuration object as an argument. It has
 
 #### Examples
 
+Save entire state tree - EASIEST OPTION.
+
 ```sh
-// Save entire state tree - EASIEST OPTION
 save()
 ```
 
+Save specific parts of the state tree.
+
 ```sh
-// Save specific parts of the state tree
 save({ states: ["user", "products"] })
 ```
 
+Save the entire state tree under the namespace "my_cool_app". The key "my_cool_app" will appear in LocalStorage.
+
 ```sh
-/*
-    Save the entire state tree under the namespace "my_cool_app".
-    The key "my_cool_app" will appear in LocalStorage 
-*/
 save({ namespace: "my_cool_app" })
 ```
 
+Save specific parts of the state tree with the namespace "my_cool_app". The keys "my_cool_app_user" and "my_cool_app_products" will appear in LocalStorage.
+
 ```sh
-/*
-    Save specific parts of the state tree with the 
-    namespace "my_cool_app". The keys "my_cool_app_user"
-    and "my_cool_app_products" will appear in LocalStorage
-*/
 save({
     states: ["user", "products"],
     namespace: "my_cool_app"
 })
 ```
 
-### load([object config])
+### load([Object config])
 Loading Redux state from LocalStorage happens during creation of the Redux store.
 
 ```sh
@@ -120,40 +117,36 @@ The **load** method takes a optional configuration object as an argument. It has
 
 #### Examples
 
+Load entire state tree - EASIEST OPTION.
+
 ```sh
-// Load entire state tree - EASIEST OPTION
 load()
 ```
 
+Load specific parts of the state tree.
+
 ```sh
-// Load specific parts of the state tree
 load({ states: ["user", "products"] })
 ```
 
+Load the entire state tree which was previously saved with the namespace "my_cool_app".
+
 ```sh
-/*
-    Load the entire state tree which was previously 
-    saved with the namespace "my_cool_app"
-*/    
 load({ namespace: "my_cool_app" })
 ```
 
+Load specific parts of the state tree which use Immutable.js data structures.
+
 ```sh
-/*
-    Load specific parts of the state tree which use 
-    Immutable.js data structures
-*/    
 load({ 
     states: ["user", "products"],
     immutablejs: true
 })
 ```
 
+Load specific parts of the state tree which was previously saved with the namespace "my_cool_app".
+
 ```sh
-/*
-    Load specific parts of the state tree which was  
-    previously saved with the namespace "my_cool_app"
-*/
 load({ 
     states: ["user", "products"],
     namespace: "my_cool_app"
@@ -168,23 +161,25 @@ If your state tree is a mixture of vanilla JavaScript objects and Immutable.js d
 
 #### Examples
 
+Load both vanilla JavaScript and Immutable.js parts of the state tree.
+
 ```sh
-// Load both vanilla JavaScript and Immutable.js parts of the state tree
 combineLoads( 
     load({ states: ["user", "categories"] }),
     load({ states: ["products"], immutablejs: true )
 )   
 ```
 
+Load parts of the state tree saved with different namespaces.
+
 ```sh
-// Load parts of the state tree saved with different namespaces
 combineLoads( 
     load({ states: ["user"], namespace: "account_stuff" }),
     load({ states: ["products", "categories"], namespace: "site_stuff" )
 )   
 ```
 
-### clear()
+### clear([Object config])
 
 Clears all Redux state tree data from LocalStorage. Note: only clears data which was saved using this module's functionality
 
@@ -202,13 +197,15 @@ The **clear** method takes a optional configuration object as an argument. It ha
 
 #### Examples
 
+Clear all Redux state tree data saved without a namespace.
+
 ```sh
-// Clear all Redux state tree data saved without a namespace
 clear()
 ```
 
+Clear Redux state tree data saved with a namespace.
+
 ```sh
-// Clear Redux state tree data saved with a namespace
 clear({
     namespace: "my_cool_app"
 })  
