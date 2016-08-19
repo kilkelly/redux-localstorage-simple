@@ -2,7 +2,7 @@
 
 import { fromJS } from "immutable"
 
-const NAMESPACE = "redux_localstorage_simple"
+const NAMESPACE_DEFAULT = "redux_localstorage_simple"
 
 /**
 	Saves specified parts of the Redux state tree into localstorage
@@ -12,19 +12,20 @@ const NAMESPACE = "redux_localstorage_simple"
 	PARAMETERS
 	----------
 	@config (Object) - 	Contains configuration options (leave blank to save entire state tree to localstorage)		
-						Properties of object:
-							states (Array of Strings) - States to save e.g. ["user", "products"]						
+
+						Properties:
+							states (Array of Strings, optional) - States to save e.g. ["user", "products"]						
+							namespace (String, optional) - Namespace to prepend your LocalStorage items
 
 	Usage example:
 	
 		save({
-			states: ["user", "products"]
+			states: ["user", "products"],
+			namespace: "my_cool_app"
 		}) 	
 */
 
-export const save = (config = {}) => {
-	
-	const states = ("states" in config) ? config.states : [];		
+export function save({ states = [], namespace = NAMESPACE_DEFAULT } = {}) {	
 
 	return store => next => action => {
 
@@ -32,13 +33,13 @@ export const save = (config = {}) => {
 
 		if (states.length === 0) {
 
-			localStorage[NAMESPACE] 
+			localStorage[namespace] 
 					= JSON.stringify(store.getState())	
 
 		} else {
 
 			states.forEach(state => { 				
-				localStorage[NAMESPACE + "_" + state] 
+				localStorage[namespace + "_" + state] 
 					= JSON.stringify(store.getState()[state])
 			})
 		}	
@@ -53,16 +54,23 @@ export const save = (config = {}) => {
 	PARAMETERS
 	----------
 	@config (Object) - 	Contains configuration options (leave blank to load entire state tree, if it was saved previously that is)
-						Properties of object:
-							states (Array of Strings) - Parts of state tree to load e.g. ["user", "products"]
-							immutablejs (Boolean) - If dealing with Immutable.js data structures, set this to true to load them correctly
+						Properties:
+							states (Array of Strings, optional) - Parts of state tree to load e.g. ["user", "products"]
+							namespace (String, optional) - Namespace required to retrieve your LocalStorage items, if any
+							immutablejs (Boolean, optional) - If dealing with Immutable.js data structures, set this to true to load them correctly
 
 	Usage examples:
 	
 		// load previously saved parts of state tree
 		load({
 			states: ["user", "products"]
-		}) 	
+		})
+
+		// load previously saved parts of state tree which were initially saved under the namespace "my_cool_app"
+		load({
+			states: ["user", "products"],
+			namespace: "my_cool_app"
+		})		 	
 
 		// load previously saved parts of state tree which use Immutable.js data structures
 		load({
@@ -72,18 +80,15 @@ export const save = (config = {}) => {
 
 */
 
-export function load(config = {}) {	
-
-	const states = ("states" in config) ? config.states : [];
-	const immutablejs = ("immutablejs" in config) ? config.immutablejs : false;	
+export function load({ states = [], immutablejs = false, namespace = NAMESPACE_DEFAULT } = {}) {	
 
 	let loadedState = {}	
 
 	if (states.length === 0) {
 
 		// does default localstorage token exist?
-		if (localStorage[NAMESPACE]) {
-			loadedState = JSON.parse(localStorage[NAMESPACE])		
+		if (localStorage[namespace]) {
+			loadedState = JSON.parse(localStorage[namespace])		
 
 			if (immutablejs) {
 				for(let key in loadedState) {
@@ -97,9 +102,9 @@ export function load(config = {}) {
 
 		states.forEach(function(state) {		
 
-			if (localStorage[NAMESPACE + "_" + state]) {
+			if (localStorage[namespace + "_" + state]) {
 
-				loadedState[state] = JSON.parse(localStorage[NAMESPACE + "_" + state])
+				loadedState[state] = JSON.parse(localStorage[namespace + "_" + state])
 
 			}		
 		})
@@ -146,13 +151,31 @@ export function combineLoads(...loads) {
 
 /**
 	Clears all Redux state tree data from LocalStorage
-	Note: only clears data which was saved using this module's functionality
+	Remember to provide a namespace if you used one during the save process
+
+	PARAMETERS
+	----------		
+	@config (Object) - 	Contains configuration options (leave blank to clear entire state tree from LocalStorage, if it was saved without a namespace)
+						Properties:
+							namespace (String, optional) - Namespace that you used during the save proces
+
+	Usage example:
+
+		// clear all Redux state tree data saved without a namespace
+		clear()
+
+		// clear Redux state tree data saved with a namespace
+		clear({
+			namespace: "my_cool_app"
+		})			
 */
 
-export function clear() {	
+export function clear({ namespace = NAMESPACE_DEFAULT } = {}) {	
 
-	for (let key in localStorage) {
-		if (key.indexOf(NAMESPACE) === 0) {
+	for (let key in localStorage) {		
+
+		// key starts with namespace
+		if (key.slice(0, namespace.length) === namespace) {
 			localStorage.removeItem(key)
 		}
 	}
