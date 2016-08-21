@@ -1,0 +1,1 @@
+- Add debouncing to prevent writing to LocalStorage too fast and slowing down the browser experience.
