@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && babel src --out-dir dist",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tape -r babel-register test/tape/**/*.js | tap-spec",
   },
   "repository": {
     "type": "git",
