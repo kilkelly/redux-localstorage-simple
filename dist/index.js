@@ -12,6 +12,19 @@ var _immutable = require("immutable");
 
 var NAMESPACE_DEFAULT = "redux_localstorage_simple";
 
+var localStorageMock = {
+	removeItem: function removeItem(key) {
+		delete this[key];
+	}
+}
+
+var localStorage = (typeof window === "undefined") ? localStorageMock : window.localStorage
+
+// when running in a non-browser environment, for example during unit tests, then mock localStorage
+if (typeof window === "undefined") {
+	console.warn("LocalStorage not detected. Package 'redux-localstorage-simple' will mock it to prevent crashing.");
+}
+
 /**
 	Saves specified parts of the Redux state tree into localstorage
 	Note: this is Redux middleware. Read this for an explanation:
