@@ -111,10 +111,8 @@ export function load({ states = [], immutablejs = false, namespace = NAMESPACE_D
 		if (localStorage[namespace]) {
 			loadedState = JSON.parse(localStorage[namespace])		
 
-			if (immutablejs) {
-				for(let key in loadedState) {
-					loadedState[key] = fromJS(loadedState[key])
-				}
+			if (immutablejs) {				
+				loadedState = fromJS(loadedState)				
 			}
 
 		}							
