@@ -4,24 +4,6 @@ import { fromJS } from "immutable"
 
 const NAMESPACE_DEFAULT = "redux_localstorage_simple"
 
-var _localStorage
-
-// when running in a non-browser environment, for example during unit tests, then mock localStorage
-if (typeof window === "undefined") {
-
-	var localStorageMock = {
-		removeItem: function removeItem(key) {
-			delete this[key];
-		}
-	}	
-	
-	_localStorage = localStorageMock
-	console.warn("LocalStorage not detected. Package 'redux-localstorage-simple' will mock it to prevent crashing.");
-}
-else {
-	_localStorage = localStorage
-}
-
 /**
 	Saves specified parts of the Redux state tree into localstorage
 	Note: this is Redux middleware. Read this for an explanation:
@@ -65,13 +47,13 @@ export function save({ states = [], namespace = NAMESPACE_DEFAULT } = {}) {
 
 		if (states.length === 0) {
 
-			_localStorage[namespace] 
+			localStorage[namespace] 
 					= JSON.stringify(store.getState())	
 
 		} else {
 
 			states.forEach(state => { 				
-				_localStorage[namespace + "_" + state] 
+				localStorage[namespace + "_" + state] 
 					= JSON.stringify(store.getState()[state])
 			})
 		}	
@@ -126,8 +108,8 @@ export function load({ states = [], immutablejs = false, namespace = NAMESPACE_D
 
 	if (states.length === 0) {
 		
-		if (_localStorage[namespace]) {
-			loadedState = JSON.parse(_localStorage[namespace])		
+		if (localStorage[namespace]) {
+			loadedState = JSON.parse(localStorage[namespace])		
 
 			if (immutablejs) {
 				for(let key in loadedState) {
@@ -141,9 +123,9 @@ export function load({ states = [], immutablejs = false, namespace = NAMESPACE_D
 
 		states.forEach(function(state) {		
 
-			if (_localStorage[namespace + "_" + state]) {
+			if (localStorage[namespace + "_" + state]) {
 
-				loadedState[state] = JSON.parse(_localStorage[namespace + "_" + state])
+				loadedState[state] = JSON.parse(localStorage[namespace + "_" + state])
 
 			}		
 		})
@@ -218,11 +200,11 @@ export function combineLoads(...loads) {
 
 export function clear({ namespace = NAMESPACE_DEFAULT } = {}) {	
 
-	for (let key in _localStorage) {		
+	for (let key in localStorage) {		
 
 		// key starts with namespace
 		if (key.slice(0, namespace.length) === namespace) {
-			_localStorage.removeItem(key)
+			localStorage.removeItem(key)
 		}
 	}
 
