@@ -166,7 +166,7 @@ Load both vanilla JavaScript and Immutable.js parts of the state tree.
 ```sh
 combineLoads( 
     load({ states: ["user", "categories"] }),
-    load({ states: ["products"], immutablejs: true )
+    load({ states: ["products"], immutablejs: true })
 )   
 ```
 
