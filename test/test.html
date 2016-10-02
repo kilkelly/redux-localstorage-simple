@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Tests for redux-localstorage-simple</title>
+		<style>
+			body {color: #888;}
+			p {margin: 3px;}
+			.true {color: green; font-weight: bold;}
+			.false {color: red; font-weight: bold;}
+		</style>		
+	</head>
+	<body>
+		<div id="testResults">
+			<h1>Tests for <u>redux-localstorage-simple</u></h1>
+			<p>Tests are run through your browser because LocalStorage needs to exist in the environment.</p>
+			<br/>
+			<p><strong>Test 0</strong>: LocalStorage, are you there? <span id="test0"></span></p>
+			<p><strong>Test 1</strong>: Save and load <u>entire</u> Redux state tree: <span id="test1"></span></p>
+			<p><strong>Test 2</strong>: Save and load <u>part</u> of Redux state tree: <span id="test2"></span></p>
+			<p><strong>Test 3</strong>: Save and load <u>entire</u> Redux state tree under a specified <u>namespace</u>: <span id="test3"></span></p>
+			<p><strong>Test 4</strong>: Save and load <u>part</u> of Redux state tree under a specified <u>namespace</u>: <span id="test4"></span></p>
+			<p><strong>Test 5</strong>: Save and load Redux state tree containing an <u>Immutable.js</u> data structure: <span id="test5"></span></p>
+			<p><strong>Test 6</strong>: Save and load Redux state tree containing both <u>regular JavaScript objects</u> and <u>Immutable.js</u> data structures: <span id="test6"></span></p>
+			<p><strong>Test 7</strong>: Clear Redux state tree data saved with the <u>default namespace</u>: <span id="test7"></span></p>
+			<p><strong>Test 8</strong>: Clear Redux state tree data saved with a <u>specific namespace</u>: <span id="test8"></span></p>
+		</div>
+		<script src="test.js"></script>
+	</body>
+</html>
