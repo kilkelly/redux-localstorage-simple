@@ -6,7 +6,7 @@ module.exports = {
 
   entry: {
     test: [  
-      "./test/test_unpacked.js"
+      "./test/test_.js"
     ]
   },
 
