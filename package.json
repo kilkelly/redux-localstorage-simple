@@ -7,8 +7,7 @@
     "clean": "rimraf dist",
     "build": "npm run build:dist && npm run build:test",
     "build:dist": "npm run clean && babel src --out-dir dist",
-    "build:test": "webpack --config test/webpack.config.test.js",    
-    "test": "tape -r babel-register test/tape/**/*.js | tap-spec"
+    "build:test": "webpack --config test/webpack.config.test.js"
   },
   "repository": {
     "type": "git",
