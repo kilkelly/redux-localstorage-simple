@@ -211,6 +211,10 @@ clear({
 })  
 ```
 
+## Testing
+
+To run tests for this package open the file 'test/test.html' in your browser. Because this package uses LocalStorage we therefore need to test it in an environment which supports it i.e. modern browsers.
+
 ## Feedback
 
 Pull requests and opened issues are welcome!
