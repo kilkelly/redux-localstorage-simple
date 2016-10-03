@@ -12,19 +12,6 @@ var _immutable = require("immutable");
 
 var NAMESPACE_DEFAULT = "redux_localstorage_simple";
 
-var localStorageMock = {
-	removeItem: function removeItem(key) {
-		delete this[key];
-	}
-}
-
-var localStorage = (typeof window === "undefined") ? localStorageMock : window.localStorage
-
-// when running in a non-browser environment, for example during unit tests, then mock localStorage
-if (typeof window === "undefined") {
-	console.warn("LocalStorage not detected. Package 'redux-localstorage-simple' will mock it to prevent crashing.");
-}
-
 /**
 	Saves specified parts of the Redux state tree into localstorage
 	Note: this is Redux middleware. Read this for an explanation:
@@ -148,9 +135,7 @@ function load() {
 			loadedState = JSON.parse(localStorage[namespace]);
 
 			if (immutablejs) {
-				for (var key in loadedState) {
-					loadedState[key] = (0, _immutable.fromJS)(loadedState[key]);
-				}
+				loadedState = (0, _immutable.fromJS)(loadedState);
 			}
 		}
 	} else {
@@ -164,8 +149,8 @@ function load() {
 		});
 
 		if (immutablejs) {
-			for (var _key in loadedState) {
-				loadedState[_key] = (0, _immutable.fromJS)(loadedState[_key]);
+			for (var key in loadedState) {
+				loadedState[key] = (0, _immutable.fromJS)(loadedState[key]);
 			}
 		}
 	}
@@ -200,8 +185,8 @@ function combineLoads() {
 
 	var combinedLoad = {};
 
-	for (var _len = arguments.length, loads = Array(_len), _key2 = 0; _key2 < _len; _key2++) {
-		loads[_key2] = arguments[_key2];
+	for (var _len = arguments.length, loads = Array(_len), _key = 0; _key < _len; _key++) {
+		loads[_key] = arguments[_key];
 	}
 
 	loads.forEach(function (load) {
