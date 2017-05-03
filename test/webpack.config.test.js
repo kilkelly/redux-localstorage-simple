@@ -1,12 +1,10 @@
-'use strict';
-
-var webpack = require('webpack')
+'use strict'
 
 module.exports = {
 
   entry: {
-    test: [  
-      "./test/test_.js"
+    test: [
+      './test/test_.js'
     ]
   },
 
@@ -14,16 +12,16 @@ module.exports = {
     loaders: [
       {
         test: /\.js?/,
-        loader: "babel",                
+        loader: 'babel',
         exclude: /node_modules/
       }
     ]
   },
 
   output: {
-    //library: 'redux-localstorage-simple',
-    //libraryTarget: 'umd',
-    filename: "./test/[name].js"
+    // library: 'redux-localstorage-simple',
+    // libraryTarget: 'umd',
+    filename: './test/[name].js'
   }
 
 }

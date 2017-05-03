@@ -46,7 +46,7 @@ export function save ({ states = [], namespace = NAMESPACE_DEFAULT } = {}) {
     if (states.length === 0) {
       localStorage[namespace] = JSON.stringify(store.getState())
     } else {
-      states.forEach(state => { 				
+      states.forEach(state => {
         localStorage[namespace + '_' + state] = JSON.stringify(store.getState()[state])
       })
     }
@@ -145,7 +145,6 @@ export function load ({ states = [], immutablejs = false, namespace = NAMESPACE_
 */
 
 export function combineLoads (...loads) {
-
   let combinedLoad = {}
 
   loads.forEach(load => {

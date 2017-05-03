@@ -171,7 +171,6 @@ function load() {
 */
 
 function combineLoads() {
-
   var combinedLoad = {};
 
   for (var _len = arguments.length, loads = Array(_len), _key = 0; _key < _len; _key++) {
