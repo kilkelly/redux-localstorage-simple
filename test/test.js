@@ -42,110 +42,110 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(1);
 
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; }; // redux-localstorage-simple dist
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; // redux-localstorage-simple dist
 
 
 	var _redux = __webpack_require__(2);
 
-	var _immutable = __webpack_require__(17);
+	var _immutable = __webpack_require__(24);
 
-	var _index = __webpack_require__(18);
+	var _index = __webpack_require__(25);
 
-	var _deepEqual = __webpack_require__(19);
+	var _deepEqual = __webpack_require__(26);
 
 	var _deepEqual2 = _interopRequireDefault(_deepEqual);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var NAMESPACE_DEFAULT = "redux_localstorage_simple";
-	var NAMESPACE_TEST = "namespace_test";
+	var NAMESPACE_DEFAULT = 'redux_localstorage_simple';
+	var NAMESPACE_TEST = 'namespace_test';
 
 	// -------------------------------------------------------------------------------
 
 	// Actions
-	var APPEND = "APPEND";
-	var ADD = "ADD";
-	var MULTIPLY = "MULTIPLY";
-	var NOOP = "NOOP";
+	var APPEND = 'APPEND';
+	var ADD = 'ADD';
+	var MULTIPLY = 'MULTIPLY';
+	var NOOP = 'NOOP';
 
 	// -------------------------------------------------------------------------------
 
 	var initialStateReducerA = {
-		x: "abc"
+	  x: 'abc'
 	};
 
 	var initialStateReducerB = {
-		y: 1
+	  y: 1
 	};
 
 	var initialStateReducerImmutable = (0, _immutable.fromJS)({
-		z: 5
+	  z: 5
 	});
 
 	var initialStateReducers = {
-		reducerA: initialStateReducerA,
-		reducerB: initialStateReducerB
+	  reducerA: initialStateReducerA,
+	  reducerB: initialStateReducerB
 	};
 
 	var initialStateReducersPlusImmutable = {
-		reducerA: initialStateReducerA,
-		reducerB: initialStateReducerB,
-		reducerImmutable: initialStateReducerImmutable
+	  reducerA: initialStateReducerA,
+	  reducerB: initialStateReducerB,
+	  reducerImmutable: initialStateReducerImmutable
 	};
 
 	// -------------------------------------------------------------------------------
 
 	var reducerA = function reducerA() {
-		var state = arguments.length <= 0 || arguments[0] === undefined ? initialStateReducerA : arguments[0];
-		var action = arguments[1];
+	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialStateReducerA;
+	  var action = arguments[1];
 
-		switch (action.type) {
-			case APPEND:
-				return {
-					x: state.x + "x"
-				};
-			case NOOP:
-				return state;
-			default:
-				return state;
-		}
+	  switch (action.type) {
+	    case APPEND:
+	      return {
+	        x: state.x + 'x'
+	      };
+	    case NOOP:
+	      return state;
+	    default:
+	      return state;
+	  }
 	};
 
 	var reducerB = function reducerB() {
-		var state = arguments.length <= 0 || arguments[0] === undefined ? initialStateReducerB : arguments[0];
-		var action = arguments[1];
+	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialStateReducerB;
+	  var action = arguments[1];
 
-		switch (action.type) {
-			case ADD:
-				return {
-					y: state.y + 1
-				};
-			default:
-				return state;
-		}
+	  switch (action.type) {
+	    case ADD:
+	      return {
+	        y: state.y + 1
+	      };
+	    default:
+	      return state;
+	  }
 	};
 
 	var reducerImmutable = function reducerImmutable() {
-		var state = arguments.length <= 0 || arguments[0] === undefined ? initialStateReducerImmutable : arguments[0];
-		var action = arguments[1];
+	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialStateReducerImmutable;
+	  var action = arguments[1];
 
-		switch (action.type) {
-			case MULTIPLY:
-				return state.set("z", state.get("z") * 2);
-			default:
-				return state;
-		}
+	  switch (action.type) {
+	    case MULTIPLY:
+	      return state.set('z', state.get('z') * 2);
+	    default:
+	      return state;
+	  }
 	};
 
 	// -------------------------------------------------------------------------------
@@ -153,12 +153,11 @@
 	// -------------------------------------------------------------------------------
 
 	{
-
-		if ((typeof localStorage === "undefined" ? "undefined" : _typeof(localStorage)) === "object") {
-			outputTestResult("test0", true);
-		} else {
-			outputTestResult("test0", false);
-		}
+	  if ((typeof localStorage === 'undefined' ? 'undefined' : _typeof(localStorage)) === 'object') {
+	    outputTestResult('test0', true);
+	  } else {
+	    outputTestResult('test0', false);
+	  }
 	}
 
 	// -------------------------------------------------------------------------------
@@ -167,21 +166,20 @@
 	clearTestData();
 
 	{
+	  var middleware = (0, _index.save)();
 
-		var middleware = (0, _index.save)();
+	  // Store which saves to LocalStorage
+	  var storeA = (0, _redux.applyMiddleware)(middleware)(_redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), initialStateReducers);
 
-		// Store which saves to LocalStorage
-		var storeA = (0, _redux.applyMiddleware)(middleware)(_redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), initialStateReducers);
+	  // Trigger a save to LocalStorage using a noop action
+	  storeA.dispatch({ type: NOOP });
 
-		// Trigger a save to LocalStorage using a noop action
-		storeA.dispatch({ type: NOOP });
+	  // Store which loads from LocalStorage
+	  var storeB = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), (0, _index.load)());
 
-		// Store which loads from LocalStorage
-		var storeB = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), (0, _index.load)());
+	  var testResult = (0, _deepEqual2.default)(storeA.getState(), storeB.getState());
 
-		var testResult = (0, _deepEqual2.default)(storeA.getState(), storeB.getState());
-
-		outputTestResult("test1", testResult);
+	  outputTestResult('test1', testResult);
 	}
 
 	// -------------------------------------------------------------------------------
@@ -190,21 +188,20 @@
 	clearTestData();
 
 	{
+	  var _middleware = (0, _index.save)({ states: ['reducerA'] });
 
-		var _middleware = (0, _index.save)({ states: ["reducerA"] });
+	  // Store which saves to LocalStorage
+	  var _storeA = (0, _redux.applyMiddleware)(_middleware)(_redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), initialStateReducers);
 
-		// Store which saves to LocalStorage
-		var _storeA = (0, _redux.applyMiddleware)(_middleware)(_redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), initialStateReducers);
+	  // Trigger a save to LocalStorage using a noop action
+	  _storeA.dispatch({ type: APPEND });
 
-		// Trigger a save to LocalStorage using a noop action
-		_storeA.dispatch({ type: APPEND });
+	  // Store which loads from LocalStorage
+	  var _storeB = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), (0, _index.load)({ states: ['reducerA'] }));
 
-		// Store which loads from LocalStorage
-		var _storeB = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), (0, _index.load)({ states: ["reducerA"] }));
+	  var _testResult = (0, _deepEqual2.default)(_storeA.getState(), _storeB.getState());
 
-		var _testResult = (0, _deepEqual2.default)(_storeA.getState(), _storeB.getState());
-
-		outputTestResult("test2", _testResult);
+	  outputTestResult('test2', _testResult);
 	}
 
 	// -------------------------------------------------------------------------------
@@ -213,21 +210,20 @@
 	clearTestData();
 
 	{
+	  var _middleware2 = (0, _index.save)({ namespace: NAMESPACE_TEST });
 
-		var _middleware2 = (0, _index.save)({ namespace: NAMESPACE_TEST });
+	  // Store which saves to LocalStorage
+	  var _storeA2 = (0, _redux.applyMiddleware)(_middleware2)(_redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), initialStateReducers);
 
-		// Store which saves to LocalStorage
-		var _storeA2 = (0, _redux.applyMiddleware)(_middleware2)(_redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), initialStateReducers);
+	  // Trigger a save to LocalStorage using a noop action
+	  _storeA2.dispatch({ type: NOOP });
 
-		// Trigger a save to LocalStorage using a noop action
-		_storeA2.dispatch({ type: NOOP });
+	  // Store which loads from LocalStorage
+	  var _storeB2 = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), (0, _index.load)({ namespace: NAMESPACE_TEST }));
 
-		// Store which loads from LocalStorage
-		var _storeB2 = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), (0, _index.load)({ namespace: NAMESPACE_TEST }));
+	  var _testResult2 = (0, _deepEqual2.default)(_storeA2.getState(), _storeB2.getState());
 
-		var _testResult2 = (0, _deepEqual2.default)(_storeA2.getState(), _storeB2.getState());
-
-		outputTestResult("test3", _testResult2);
+	  outputTestResult('test3', _testResult2);
 	}
 
 	// -------------------------------------------------------------------------------
@@ -236,21 +232,20 @@
 	clearTestData();
 
 	{
+	  var _middleware3 = (0, _index.save)({ states: ['reducerA'], namespace: NAMESPACE_TEST });
 
-		var _middleware3 = (0, _index.save)({ states: ["reducerA"], namespace: NAMESPACE_TEST });
+	  // Store which saves to LocalStorage
+	  var _storeA3 = (0, _redux.applyMiddleware)(_middleware3)(_redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), initialStateReducers);
 
-		// Store which saves to LocalStorage
-		var _storeA3 = (0, _redux.applyMiddleware)(_middleware3)(_redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), initialStateReducers);
+	  // Trigger a save to LocalStorage using a noop action
+	  _storeA3.dispatch({ type: APPEND });
 
-		// Trigger a save to LocalStorage using a noop action
-		_storeA3.dispatch({ type: APPEND });
+	  // Store which loads from LocalStorage
+	  var _storeB3 = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), (0, _index.load)({ states: ['reducerA'], namespace: NAMESPACE_TEST }));
 
-		// Store which loads from LocalStorage
-		var _storeB3 = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), (0, _index.load)({ states: ["reducerA"], namespace: NAMESPACE_TEST }));
+	  var _testResult3 = (0, _deepEqual2.default)(_storeA3.getState(), _storeB3.getState());
 
-		var _testResult3 = (0, _deepEqual2.default)(_storeA3.getState(), _storeB3.getState());
-
-		outputTestResult("test4", _testResult3);
+	  outputTestResult('test4', _testResult3);
 	}
 
 	// -------------------------------------------------------------------------------
@@ -259,22 +254,21 @@
 	clearTestData();
 
 	{
+	  var _middleware4 = (0, _index.save)();
 
-		var _middleware4 = (0, _index.save)();
+	  // Store which saves to LocalStorage
+	  var _storeA4 = (0, _redux.applyMiddleware)(_middleware4)(_redux.createStore)(reducerImmutable, initialStateReducerImmutable);
 
-		// Store which saves to LocalStorage
-		var _storeA4 = (0, _redux.applyMiddleware)(_middleware4)(_redux.createStore)(reducerImmutable, initialStateReducerImmutable);
+	  // Trigger a save to LocalStorage using a noop action
+	  _storeA4.dispatch({ type: MULTIPLY });
 
-		// Trigger a save to LocalStorage using a noop action
-		_storeA4.dispatch({ type: MULTIPLY });
+	  // Store which loads from LocalStorage
+	  var _storeB4 = (0, _redux.createStore)(reducerImmutable, (0, _index.load)({ immutablejs: true }));
 
-		// Store which loads from LocalStorage
-		var _storeB4 = (0, _redux.createStore)(reducerImmutable, (0, _index.load)({ immutablejs: true }));
+	  // Using Immutable.js 'is' function to perform equality check
+	  var _testResult4 = (0, _immutable.is)(_storeA4.getState(), _storeB4.getState());
 
-		// Using Immutable.js 'is' function to perform equality check
-		var _testResult4 = (0, _immutable.is)(_storeA4.getState(), _storeB4.getState());
-
-		outputTestResult("test5", _testResult4);
+	  outputTestResult('test5', _testResult4);
 	}
 
 	// -------------------------------------------------------------------------------
@@ -284,21 +278,20 @@
 	clearTestData();
 
 	{
+	  var _middleware5 = (0, _index.save)();
 
-		var _middleware5 = (0, _index.save)();
+	  // Store which saves to LocalStorage
+	  var _storeA5 = (0, _redux.applyMiddleware)(_middleware5)(_redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB, reducerImmutable: reducerImmutable }), initialStateReducersPlusImmutable);
 
-		// Store which saves to LocalStorage
-		var _storeA5 = (0, _redux.applyMiddleware)(_middleware5)(_redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB, reducerImmutable: reducerImmutable }), initialStateReducersPlusImmutable);
+	  // Trigger a save to LocalStorage using a noop action
+	  _storeA5.dispatch({ type: NOOP });
 
-		// Trigger a save to LocalStorage using a noop action
-		_storeA5.dispatch({ type: NOOP });
+	  // Store which loads from LocalStorage
+	  var _storeB5 = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB, reducerImmutable: reducerImmutable }), (0, _index.combineLoads)((0, _index.load)({ states: ['reducerA', 'reducerB'] }), (0, _index.load)({ states: ['reducerImmutable'], immutablejs: true })));
 
-		// Store which loads from LocalStorage
-		var _storeB5 = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB, reducerImmutable: reducerImmutable }), (0, _index.combineLoads)((0, _index.load)({ states: ["reducerA", "reducerB"] }), (0, _index.load)({ states: ["reducerImmutable"], immutablejs: true })));
+	  var _testResult5 = (0, _deepEqual2.default)(_storeA5.getState()['reducerA'], _storeB5.getState()['reducerA']) && (0, _deepEqual2.default)(_storeA5.getState()['reducerB'], _storeB5.getState()['reducerB']) && (0, _immutable.is)(_storeA5.getState()['reducerImmutable'], _storeB5.getState()['reducerImmutable']);
 
-		var _testResult5 = (0, _deepEqual2.default)(_storeA5.getState()["reducerA"], _storeB5.getState()["reducerA"]) && (0, _deepEqual2.default)(_storeA5.getState()["reducerB"], _storeB5.getState()["reducerB"]) && (0, _immutable.is)(_storeA5.getState()["reducerImmutable"], _storeB5.getState()["reducerImmutable"]);
-
-		outputTestResult("test6", _testResult5);
+	  outputTestResult('test6', _testResult5);
 	}
 
 	// -------------------------------------------------------------------------------
@@ -307,28 +300,27 @@
 	clearTestData();
 
 	{
+	  // Store that saves without a namespace
+	  var _storeA6 = (0, _redux.applyMiddleware)((0, _index.save)())(_redux.createStore)(reducerA, initialStateReducerA);
+	  // Trigger a save to LocalStorage using a noop action
+	  _storeA6.dispatch({ type: NOOP });
 
-		// Store that saves without a namespace
-		var _storeA6 = (0, _redux.applyMiddleware)((0, _index.save)())(_redux.createStore)(reducerA, initialStateReducerA);
-		// Trigger a save to LocalStorage using a noop action
-		_storeA6.dispatch({ type: NOOP });
+	  // Store that saves WITH a namespace
+	  var _storeB6 = (0, _redux.applyMiddleware)((0, _index.save)({ namespace: NAMESPACE_TEST }))(_redux.createStore)(reducerA, initialStateReducerA);
+	  // Trigger a save to LocalStorage using a noop action
+	  _storeB6.dispatch({ type: NOOP });
 
-		// Store that saves WITH a namespace
-		var _storeB6 = (0, _redux.applyMiddleware)((0, _index.save)({ namespace: NAMESPACE_TEST }))(_redux.createStore)(reducerA, initialStateReducerA);
-		// Trigger a save to LocalStorage using a noop action
-		_storeB6.dispatch({ type: NOOP });
+	  // Perform the LocalStorage clearing
+	  (0, _index.clear)();
 
-		// Perform the LocalStorage clearing
-		(0, _index.clear)();
-
-		outputTestResult("test7", true); // Default test result to true
-		for (var key in localStorage) {
-			// If data found with default namespace then clearing data has failed
-			if (key.slice(0, NAMESPACE_DEFAULT.length) === NAMESPACE_DEFAULT) {
-				// Fail the test			
-				outputTestResult("test7", false);
-			}
-		}
+	  outputTestResult('test7', true); // Default test result to true
+	  for (var key in localStorage) {
+	    // If data found with default namespace then clearing data has failed
+	    if (key.slice(0, NAMESPACE_DEFAULT.length) === NAMESPACE_DEFAULT) {
+	      // Fail the test
+	      outputTestResult('test7', false);
+	    }
+	  }
 	}
 
 	// -------------------------------------------------------------------------------
@@ -337,53 +329,49 @@
 	clearTestData();
 
 	{
+	  // Store that saves without a namespace
+	  var _storeA7 = (0, _redux.applyMiddleware)((0, _index.save)())(_redux.createStore)(reducerA, initialStateReducerA);
+	  // Trigger a save to LocalStorage using a noop action
+	  _storeA7.dispatch({ type: NOOP });
 
-		// Store that saves without a namespace
-		var _storeA7 = (0, _redux.applyMiddleware)((0, _index.save)())(_redux.createStore)(reducerA, initialStateReducerA);
-		// Trigger a save to LocalStorage using a noop action
-		_storeA7.dispatch({ type: NOOP });
+	  // Store that saves WITH a namespace
+	  var _storeB7 = (0, _redux.applyMiddleware)((0, _index.save)({ namespace: NAMESPACE_TEST }))(_redux.createStore)(reducerA, initialStateReducerA);
+	  // Trigger a save to LocalStorage using a noop action
+	  _storeB7.dispatch({ type: NOOP });
 
-		// Store that saves WITH a namespace
-		var _storeB7 = (0, _redux.applyMiddleware)((0, _index.save)({ namespace: NAMESPACE_TEST }))(_redux.createStore)(reducerA, initialStateReducerA);
-		// Trigger a save to LocalStorage using a noop action
-		_storeB7.dispatch({ type: NOOP });
+	  // Perform the LocalStorage clearing
+	  (0, _index.clear)({ namespace: NAMESPACE_TEST });
 
-		// Perform the LocalStorage clearing
-		(0, _index.clear)({ namespace: NAMESPACE_TEST });
-
-		outputTestResult("test8", true); // Default test result to true
-		for (var _key in localStorage) {
-			// If data found with specified namespace then clearing data has failed
-			if (_key.slice(0, NAMESPACE_TEST.length) === NAMESPACE_TEST) {
-				// Fail the test			
-				outputTestResult("test8", false);
-			}
-		}
+	  outputTestResult('test8', true); // Default test result to true
+	  for (var _key in localStorage) {
+	    // If data found with specified namespace then clearing data has failed
+	    if (_key.slice(0, NAMESPACE_TEST.length) === NAMESPACE_TEST) {
+	      // Fail the test
+	      outputTestResult('test8', false);
+	    }
+	  }
 	}
 
 	// -------------------------------------------------------------------------------
 
 	// Output result of test in browser
 	function outputTestResult(test, testResult) {
-		document.getElementById(test).innerHTML = testResult ? "SUCCESS" : "FAILED";
-		document.getElementById(test).className = testResult ? "true" : "false";
+	  document.getElementById(test).innerHTML = testResult ? 'SUCCESS' : 'FAILED';
+	  document.getElementById(test).className = testResult ? 'true' : 'false';
 	}
 
 	// Clear test data in LocalStorage
 	function clearTestData() {
-
-		for (var _key2 in localStorage) {
-
-			if (_key2.slice(0, NAMESPACE_DEFAULT.length) === NAMESPACE_DEFAULT || _key2.slice(0, NAMESPACE_TEST.length) === NAMESPACE_TEST) {
-
-				localStorage.removeItem(_key2);
-			}
-		}
+	  for (var _key2 in localStorage) {
+	    if (_key2.slice(0, NAMESPACE_DEFAULT.length) === NAMESPACE_DEFAULT || _key2.slice(0, NAMESPACE_TEST.length) === NAMESPACE_TEST) {
+	      localStorage.removeItem(_key2);
+	    }
+	  }
 	}
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 
@@ -394,23 +382,23 @@
 
 	var _createStore2 = _interopRequireDefault(_createStore);
 
-	var _combineReducers = __webpack_require__(12);
+	var _combineReducers = __webpack_require__(19);
 
 	var _combineReducers2 = _interopRequireDefault(_combineReducers);
 
-	var _bindActionCreators = __webpack_require__(14);
+	var _bindActionCreators = __webpack_require__(21);
 
 	var _bindActionCreators2 = _interopRequireDefault(_bindActionCreators);
 
-	var _applyMiddleware = __webpack_require__(15);
+	var _applyMiddleware = __webpack_require__(22);
 
 	var _applyMiddleware2 = _interopRequireDefault(_applyMiddleware);
 
-	var _compose = __webpack_require__(16);
+	var _compose = __webpack_require__(23);
 
 	var _compose2 = _interopRequireDefault(_compose);
 
-	var _warning = __webpack_require__(13);
+	var _warning = __webpack_require__(20);
 
 	var _warning2 = _interopRequireDefault(_warning);
 
@@ -433,9 +421,9 @@
 	exports.compose = _compose2['default'];
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	// shim for using process in browser
 	var process = module.exports = {};
@@ -607,6 +595,10 @@
 	process.removeListener = noop;
 	process.removeAllListeners = noop;
 	process.emit = noop;
+	process.prependListener = noop;
+	process.prependOnceListener = noop;
+
+	process.listeners = function (name) { return [] }
 
 	process.binding = function (name) {
 	    throw new Error('process.binding is not supported');
@@ -619,9 +611,9 @@
 	process.umask = function() { return 0; };
 
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -633,7 +625,7 @@
 
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
-	var _symbolObservable = __webpack_require__(9);
+	var _symbolObservable = __webpack_require__(15);
 
 	var _symbolObservable2 = _interopRequireDefault(_symbolObservable);
 
@@ -885,35 +877,29 @@
 	  }, _ref2[_symbolObservable2['default']] = observable, _ref2;
 	}
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	var getPrototype = __webpack_require__(6),
-	    isHostObject = __webpack_require__(7),
-	    isObjectLike = __webpack_require__(8);
+	var baseGetTag = __webpack_require__(6),
+	    getPrototype = __webpack_require__(12),
+	    isObjectLike = __webpack_require__(14);
 
 	/** `Object#toString` result references. */
 	var objectTag = '[object Object]';
 
 	/** Used for built-in method references. */
-	var objectProto = Object.prototype;
+	var funcProto = Function.prototype,
+	    objectProto = Object.prototype;
 
 	/** Used to resolve the decompiled source of functions. */
-	var funcToString = Function.prototype.toString;
+	var funcToString = funcProto.toString;
 
 	/** Used to check objects for own properties. */
 	var hasOwnProperty = objectProto.hasOwnProperty;
 
 	/** Used to infer the `Object` constructor. */
 	var objectCtorString = funcToString.call(Object);
-
-	/**
-	 * Used to resolve the
-	 * [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
-	 * of values.
-	 */
-	var objectToString = objectProto.toString;
 
 	/**
 	 * Checks if `value` is a plain object, that is, an object created by the
@@ -924,8 +910,7 @@
 	 * @since 0.8.0
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a plain object,
-	 *  else `false`.
+	 * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
 	 * @example
 	 *
 	 * function Foo() {
@@ -945,8 +930,7 @@
 	 * // => true
 	 */
 	function isPlainObject(value) {
-	  if (!isObjectLike(value) ||
-	      objectToString.call(value) != objectTag || isHostObject(value)) {
+	  if (!isObjectLike(value) || baseGetTag(value) != objectTag) {
 	    return false;
 	  }
 	  var proto = getPrototype(value);
@@ -954,63 +938,201 @@
 	    return true;
 	  }
 	  var Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
-	  return (typeof Ctor == 'function' &&
-	    Ctor instanceof Ctor && funcToString.call(Ctor) == objectCtorString);
+	  return typeof Ctor == 'function' && Ctor instanceof Ctor &&
+	    funcToString.call(Ctor) == objectCtorString;
 	}
 
 	module.exports = isPlainObject;
 
 
-/***/ },
+/***/ }),
 /* 6 */
-/***/ function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	/* Built-in method references for those with the same name as other `lodash` methods. */
-	var nativeGetPrototype = Object.getPrototypeOf;
+	var Symbol = __webpack_require__(7),
+	    getRawTag = __webpack_require__(10),
+	    objectToString = __webpack_require__(11);
+
+	/** `Object#toString` result references. */
+	var nullTag = '[object Null]',
+	    undefinedTag = '[object Undefined]';
+
+	/** Built-in value references. */
+	var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
 
 	/**
-	 * Gets the `[[Prototype]]` of `value`.
+	 * The base implementation of `getTag` without fallbacks for buggy environments.
 	 *
 	 * @private
 	 * @param {*} value The value to query.
-	 * @returns {null|Object} Returns the `[[Prototype]]`.
+	 * @returns {string} Returns the `toStringTag`.
 	 */
-	function getPrototype(value) {
-	  return nativeGetPrototype(Object(value));
+	function baseGetTag(value) {
+	  if (value == null) {
+	    return value === undefined ? undefinedTag : nullTag;
+	  }
+	  return (symToStringTag && symToStringTag in Object(value))
+	    ? getRawTag(value)
+	    : objectToString(value);
 	}
 
-	module.exports = getPrototype;
+	module.exports = baseGetTag;
 
 
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+	var root = __webpack_require__(8);
+
+	/** Built-in value references. */
+	var Symbol = root.Symbol;
+
+	module.exports = Symbol;
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var freeGlobal = __webpack_require__(9);
+
+	/** Detect free variable `self`. */
+	var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+	/** Used as a reference to the global object. */
+	var root = freeGlobal || freeSelf || Function('return this')();
+
+	module.exports = root;
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/** Detect free variable `global` from Node.js. */
+	var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
+
+	module.exports = freeGlobal;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var Symbol = __webpack_require__(7);
+
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+
+	/** Used to check objects for own properties. */
+	var hasOwnProperty = objectProto.hasOwnProperty;
 
 	/**
-	 * Checks if `value` is a host object in IE < 9.
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var nativeObjectToString = objectProto.toString;
+
+	/** Built-in value references. */
+	var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
+
+	/**
+	 * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
 	 *
 	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a host object, else `false`.
+	 * @param {*} value The value to query.
+	 * @returns {string} Returns the raw `toStringTag`.
 	 */
-	function isHostObject(value) {
-	  // Many host objects are `Object` objects that can coerce to strings
-	  // despite having improperly defined `toString` methods.
-	  var result = false;
-	  if (value != null && typeof value.toString != 'function') {
-	    try {
-	      result = !!(value + '');
-	    } catch (e) {}
+	function getRawTag(value) {
+	  var isOwn = hasOwnProperty.call(value, symToStringTag),
+	      tag = value[symToStringTag];
+
+	  try {
+	    value[symToStringTag] = undefined;
+	    var unmasked = true;
+	  } catch (e) {}
+
+	  var result = nativeObjectToString.call(value);
+	  if (unmasked) {
+	    if (isOwn) {
+	      value[symToStringTag] = tag;
+	    } else {
+	      delete value[symToStringTag];
+	    }
 	  }
 	  return result;
 	}
 
-	module.exports = isHostObject;
+	module.exports = getRawTag;
 
 
-/***/ },
-/* 8 */
-/***/ function(module, exports) {
+/***/ }),
+/* 11 */
+/***/ (function(module, exports) {
+
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+
+	/**
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var nativeObjectToString = objectProto.toString;
+
+	/**
+	 * Converts `value` to a string using `Object.prototype.toString`.
+	 *
+	 * @private
+	 * @param {*} value The value to convert.
+	 * @returns {string} Returns the converted string.
+	 */
+	function objectToString(value) {
+	  return nativeObjectToString.call(value);
+	}
+
+	module.exports = objectToString;
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var overArg = __webpack_require__(13);
+
+	/** Built-in value references. */
+	var getPrototype = overArg(Object.getPrototypeOf, Object);
+
+	module.exports = getPrototype;
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports) {
+
+	/**
+	 * Creates a unary function that invokes `func` with its argument transformed.
+	 *
+	 * @private
+	 * @param {Function} func The function to wrap.
+	 * @param {Function} transform The argument transform.
+	 * @returns {Function} Returns the new function.
+	 */
+	function overArg(func, transform) {
+	  return function(arg) {
+	    return func(transform(arg));
+	  };
+	}
+
+	module.exports = overArg;
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports) {
 
 	/**
 	 * Checks if `value` is object-like. A value is object-like if it's not `null`
@@ -1037,50 +1159,73 @@
 	 * // => false
 	 */
 	function isObjectLike(value) {
-	  return !!value && typeof value == 'object';
+	  return value != null && typeof value == 'object';
 	}
 
 	module.exports = isObjectLike;
 
 
-/***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(10);
+	module.exports = __webpack_require__(16);
 
 
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+	/* WEBPACK VAR INJECTION */(function(global, module) {'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 
-	var _ponyfill = __webpack_require__(11);
+	var _ponyfill = __webpack_require__(18);
 
 	var _ponyfill2 = _interopRequireDefault(_ponyfill);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var root = undefined; /* global window */
+	var root; /* global window */
 
-	if (typeof global !== 'undefined') {
-		root = global;
+
+	if (typeof self !== 'undefined') {
+	  root = self;
 	} else if (typeof window !== 'undefined') {
-		root = window;
+	  root = window;
+	} else if (typeof global !== 'undefined') {
+	  root = global;
+	} else if (true) {
+	  root = module;
+	} else {
+	  root = Function('return this')();
 	}
 
 	var result = (0, _ponyfill2['default'])(root);
 	exports['default'] = result;
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(17)(module)))
 
-/***/ },
-/* 11 */
-/***/ function(module, exports) {
+/***/ }),
+/* 17 */
+/***/ (function(module, exports) {
+
+	module.exports = function(module) {
+		if(!module.webpackPolyfill) {
+			module.deprecate = function() {};
+			module.paths = [];
+			// module.parent = undefined by default
+			module.children = [];
+			module.webpackPolyfill = 1;
+		}
+		return module;
+	}
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -1106,9 +1251,9 @@
 		return result;
 	};
 
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 
@@ -1121,7 +1266,7 @@
 
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
-	var _warning = __webpack_require__(13);
+	var _warning = __webpack_require__(20);
 
 	var _warning2 = _interopRequireDefault(_warning);
 
@@ -1254,9 +1399,9 @@
 	}
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
-/***/ },
-/* 13 */
-/***/ function(module, exports) {
+/***/ }),
+/* 20 */
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -1284,9 +1429,9 @@
 	  /* eslint-enable no-empty */
 	}
 
-/***/ },
-/* 14 */
-/***/ function(module, exports) {
+/***/ }),
+/* 21 */
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -1340,9 +1485,9 @@
 	  return boundActionCreators;
 	}
 
-/***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -1352,7 +1497,7 @@
 
 	exports['default'] = applyMiddleware;
 
-	var _compose = __webpack_require__(16);
+	var _compose = __webpack_require__(23);
 
 	var _compose2 = _interopRequireDefault(_compose);
 
@@ -1403,9 +1548,9 @@
 	  };
 	}
 
-/***/ },
-/* 16 */
-/***/ function(module, exports) {
+/***/ }),
+/* 23 */
+/***/ (function(module, exports) {
 
 	"use strict";
 
@@ -1446,9 +1591,9 @@
 	  };
 	}
 
-/***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	/**
 	 *  Copyright (c) 2014-2015, Facebook, Inc.
@@ -6430,254 +6575,240 @@
 
 	}));
 
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 	exports.save = save;
 	exports.load = load;
 	exports.combineLoads = combineLoads;
 	exports.clear = clear;
 
-	var _immutable = __webpack_require__(17);
+	var _immutable = __webpack_require__(24);
 
-	var NAMESPACE_DEFAULT = "redux_localstorage_simple";
+	var NAMESPACE_DEFAULT = 'redux_localstorage_simple';
 
 	/**
-		Saves specified parts of the Redux state tree into localstorage
-		Note: this is Redux middleware. Read this for an explanation:
-		http://redux.js.org/docs/advanced/Middleware.html
-		
-		PARAMETERS
-		----------
-		@config (Object) - 	Contains configuration options (leave blank to save entire state tree to localstorage)		
+	  Saves specified parts of the Redux state tree into localstorage
+	  Note: this is Redux middleware. Read this for an explanation:
+	  http://redux.js.org/docs/advanced/Middleware.html
 
-							Properties:
-								states (Array of Strings, optional) - States to save e.g. ["user", "products"]						
-								namespace (String, optional) - Namespace to add before your LocalStorage items
+	  PARAMETERS
+	  ----------
+	  @config (Object) - Contains configuration options (leave blank to save entire state tree to localstorage)
 
-		Usage examples:
+	            Properties:
+	              states (Array of Strings, optional) - States to save e.g. ['user', 'products']
+	              namespace (String, optional) - Namespace to add before your LocalStorage items
 
-			// save entire state tree - EASIEST OPTION
-			save()
+	  Usage examples:
 
-			// save specific parts of the state tree
-			save({ 
-				states: ["user", "products"]
-			})		
+	    // save entire state tree - EASIEST OPTION
+	    save()
 
-			// save the entire state tree under the namespace "my_cool_app". The key "my_cool_app" will appear in LocalStorage
-			save({
-				namespace: "my_cool_app"
-			})
-		
-			// save specific parts of the state tree with the namespace "my_cool_app". The keys "my_cool_app_user" and "my_cool_app_products" will appear in LocalStorage
-			save({
-			    states: ["user", "products"],
-			    namespace: "my_cool_app"
-			})
+	    // save specific parts of the state tree
+	    save({
+	      states: ['user', 'products']
+	    })
+
+	    // save the entire state tree under the namespace 'my_cool_app'. The key 'my_cool_app' will appear in LocalStorage
+	    save({
+	      namespace: 'my_cool_app'
+	    })
+
+	    // save specific parts of the state tree with the namespace 'my_cool_app'. The keys 'my_cool_app_user' and 'my_cool_app_products' will appear in LocalStorage
+	    save({
+	        states: ['user', 'products'],
+	        namespace: 'my_cool_app'
+	    })
 	*/
 
 	function save() {
-		var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	      _ref$states = _ref.states,
+	      states = _ref$states === undefined ? [] : _ref$states,
+	      _ref$namespace = _ref.namespace,
+	      namespace = _ref$namespace === undefined ? NAMESPACE_DEFAULT : _ref$namespace;
 
-		var _ref$states = _ref.states;
-		var states = _ref$states === undefined ? [] : _ref$states;
-		var _ref$namespace = _ref.namespace;
-		var namespace = _ref$namespace === undefined ? NAMESPACE_DEFAULT : _ref$namespace;
+	  return function (store) {
+	    return function (next) {
+	      return function (action) {
+	        next(action);
 
-
-		return function (store) {
-			return function (next) {
-				return function (action) {
-
-					next(action);
-
-					if (states.length === 0) {
-
-						localStorage[namespace] = JSON.stringify(store.getState());
-					} else {
-
-						states.forEach(function (state) {
-							localStorage[namespace + "_" + state] = JSON.stringify(store.getState()[state]);
-						});
-					}
-				};
-			};
-		};
+	        if (states.length === 0) {
+	          localStorage[namespace] = JSON.stringify(store.getState());
+	        } else {
+	          states.forEach(function (state) {
+	            localStorage[namespace + '_' + state] = JSON.stringify(store.getState()[state]);
+	          });
+	        }
+	      };
+	    };
+	  };
 	}
 
 	/**
-		Loads specified states from localstorage into the Redux state tree. 
-			
-		PARAMETERS
-		----------
-		@config (Object) - 	Contains configuration options (leave blank to load entire state tree, if it was saved previously that is)
-							Properties:
-								states (Array of Strings, optional) - Parts of state tree to load e.g. ["user", "products"]
-								namespace (String, optional) - Namespace required to retrieve your LocalStorage items, if any
-								immutablejs (Boolean, optional) - If dealing with Immutable.js data structures, set this to true to load them correctly
+	  Loads specified states from localstorage into the Redux state tree.
 
-		Usage examples:
-				
-			// load entire state tree - EASIEST OPTION
-			load()
+	  PARAMETERS
+	  ----------
+	  @config (Object) - Contains configuration options (leave blank to load entire state tree, if it was saved previously that is)
+	            Properties:
+	              states (Array of Strings, optional) - Parts of state tree to load e.g. ['user', 'products']
+	              namespace (String, optional) - Namespace required to retrieve your LocalStorage items, if any
+	              immutablejs (Boolean, optional) - If dealing with Immutable.js data structures, set this to true to load them correctly
 
-			// load specific parts of the state tree
-			load({
-				states: ["user", "products"]
-			})
+	  Usage examples:
 
-			// load the entire state tree which was previously saved with the namespace "my_cool_app"
-			load({
-				namespace: "my_cool_app"
-			})
+	    // load entire state tree - EASIEST OPTION
+	    load()
 
-			// load specific parts of the state tree which use Immutable.js data structures
-			load({ 
-			    states: ["user", "products"],
-			    immutablejs: true
-			})
+	    // load specific parts of the state tree
+	    load({
+	      states: ['user', 'products']
+	    })
 
-			// load specific parts of the state tree which was previously saved with the namespace "my_cool_app"
-			load({ 
-			    states: ["user", "products"],
-			    namespace: "my_cool_app"
-			})
+	    // load the entire state tree which was previously saved with the namespace "my_cool_app"
+	    load({
+	      namespace: 'my_cool_app'
+	    })
+
+	    // load specific parts of the state tree which use Immutable.js data structures
+	    load({
+	        states: ['user', 'products'],
+	        immutablejs: true
+	    })
+
+	    // load specific parts of the state tree which was previously saved with the namespace "my_cool_app"
+	    load({
+	        states: ['user', 'products'],
+	        namespace: 'my_cool_app'
+	    })
 
 	*/
 
 	function load() {
-		var _ref2 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	  var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	      _ref2$states = _ref2.states,
+	      states = _ref2$states === undefined ? [] : _ref2$states,
+	      _ref2$immutablejs = _ref2.immutablejs,
+	      immutablejs = _ref2$immutablejs === undefined ? false : _ref2$immutablejs,
+	      _ref2$namespace = _ref2.namespace,
+	      namespace = _ref2$namespace === undefined ? NAMESPACE_DEFAULT : _ref2$namespace;
 
-		var _ref2$states = _ref2.states;
-		var states = _ref2$states === undefined ? [] : _ref2$states;
-		var _ref2$immutablejs = _ref2.immutablejs;
-		var immutablejs = _ref2$immutablejs === undefined ? false : _ref2$immutablejs;
-		var _ref2$namespace = _ref2.namespace;
-		var namespace = _ref2$namespace === undefined ? NAMESPACE_DEFAULT : _ref2$namespace;
+	  var loadedState = {};
 
+	  if (states.length === 0) {
+	    if (localStorage[namespace]) {
+	      loadedState = JSON.parse(localStorage[namespace]);
 
-		var loadedState = {};
+	      if (immutablejs) {
+	        loadedState = (0, _immutable.fromJS)(loadedState);
+	      }
+	    }
+	  } else {
+	    states.forEach(function (state) {
+	      if (localStorage[namespace + '_' + state]) {
+	        loadedState[state] = JSON.parse(localStorage[namespace + '_' + state]);
+	      }
+	    });
 
-		if (states.length === 0) {
+	    if (immutablejs) {
+	      for (var key in loadedState) {
+	        loadedState[key] = (0, _immutable.fromJS)(loadedState[key]);
+	      }
+	    }
+	  }
 
-			if (localStorage[namespace]) {
-				loadedState = JSON.parse(localStorage[namespace]);
-
-				if (immutablejs) {
-					loadedState = (0, _immutable.fromJS)(loadedState);
-				}
-			}
-		} else {
-
-			states.forEach(function (state) {
-
-				if (localStorage[namespace + "_" + state]) {
-
-					loadedState[state] = JSON.parse(localStorage[namespace + "_" + state]);
-				}
-			});
-
-			if (immutablejs) {
-				for (var key in loadedState) {
-					loadedState[key] = (0, _immutable.fromJS)(loadedState[key]);
-				}
-			}
-		}
-
-		return loadedState;
+	  return loadedState;
 	}
 
 	/**
-		Combines multiple 'load' method calls to return a single state for use in Redux's createStore method.
-		Use this when parts of the loading process need to be handled differently e.g. some parts of your state tree are immutable and some are not
-			
-		PARAMETERS
-		----------		
-		@loads - 'load' method calls passed into this method as normal arguments
+	  Combines multiple 'load' method calls to return a single state for use in Redux's createStore method.
+	  Use this when parts of the loading process need to be handled differently e.g. some parts of your state tree are immutable and some are not
 
-		Usage example:
+	  PARAMETERS
+	  ----------
+	  @loads - 'load' method calls passed into this method as normal arguments
 
-			// load both vanilla JavaScript and Immutable.js parts of the state tree from LocalStorage
-			combineLoads( 
-				load({ states: ["user"] }), // loading normal object
-				load({ states: ["products"], immutablejs: true ) // this part of the state tree is an Immutable.js structure
-			)	
+	  Usage example:
 
-			// Load parts of the state tree saved with different namespaces
-			combineLoads( 
-			    load({ states: ["user"], namespace: "account_stuff" }),
-			    load({ states: ["products", "categories"], namespace: "site_stuff" )
-			)   		
+	    // load both vanilla JavaScript and Immutable.js parts of the state tree from LocalStorage
+	    combineLoads(
+	      load({ states: ['user'] }), // loading normal object
+	      load({ states: ['products'], immutablejs: true ) // this part of the state tree is an Immutable.js structure
+	    )
+
+	    // Load parts of the state tree saved with different namespaces
+	    combineLoads(
+	        load({ states: ['user'], namespace: 'account_stuff' }),
+	        load({ states: ['products', 'categories'], namespace: 'site_stuff' )
+	    )
 	*/
 
 	function combineLoads() {
 
-		var combinedLoad = {};
+	  var combinedLoad = {};
 
-		for (var _len = arguments.length, loads = Array(_len), _key = 0; _key < _len; _key++) {
-			loads[_key] = arguments[_key];
-		}
+	  for (var _len = arguments.length, loads = Array(_len), _key = 0; _key < _len; _key++) {
+	    loads[_key] = arguments[_key];
+	  }
 
-		loads.forEach(function (load) {
-			for (var state in load) {
-				combinedLoad[state] = load[state];
-			}
-		});
+	  loads.forEach(function (load) {
+	    for (var state in load) {
+	      combinedLoad[state] = load[state];
+	    }
+	  });
 
-		return combinedLoad;
+	  return combinedLoad;
 	}
 
 	/**
-		Clears all Redux state tree data from LocalStorage
-		Remember to provide a namespace if you used one during the save process
+	  Clears all Redux state tree data from LocalStorage
+	  Remember to provide a namespace if you used one during the save process
 
-		PARAMETERS
-		----------		
-		@config (Object) - 	Contains configuration options (leave blank to clear entire state tree from LocalStorage, if it was saved without a namespace)
-							Properties:
-								namespace (String, optional) - Namespace that you used during the save process
+	  PARAMETERS
+	  ----------
+	  @config (Object) -Contains configuration options (leave blank to clear entire state tree from LocalStorage, if it was saved without a namespace)
+	            Properties:
+	              namespace (String, optional) - Namespace that you used during the save process
 
-		Usage example:
+	  Usage example:
 
-			// clear all Redux state tree data saved without a namespace
-			clear()
+	    // clear all Redux state tree data saved without a namespace
+	    clear()
 
-			// clear Redux state tree data saved with a namespace
-			clear({
-				namespace: "my_cool_app"
-			})			
+	    // clear Redux state tree data saved with a namespace
+	    clear({
+	      namespace: 'my_cool_app'
+	    })
 	*/
 
 	function clear() {
-		var _ref3 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	  var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	      _ref3$namespace = _ref3.namespace,
+	      namespace = _ref3$namespace === undefined ? NAMESPACE_DEFAULT : _ref3$namespace;
 
-		var _ref3$namespace = _ref3.namespace;
-		var namespace = _ref3$namespace === undefined ? NAMESPACE_DEFAULT : _ref3$namespace;
-
-
-		for (var key in localStorage) {
-
-			// key starts with namespace
-			if (key.slice(0, namespace.length) === namespace) {
-				localStorage.removeItem(key);
-			}
-		}
+	  for (var key in localStorage) {
+	    // key starts with namespace
+	    if (key.slice(0, namespace.length) === namespace) {
+	      localStorage.removeItem(key);
+	    }
+	  }
 	}
 
-/***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var pSlice = Array.prototype.slice;
-	var objectKeys = __webpack_require__(20);
-	var isArguments = __webpack_require__(21);
+	var objectKeys = __webpack_require__(27);
+	var isArguments = __webpack_require__(28);
 
 	var deepEqual = module.exports = function (actual, expected, opts) {
 	  if (!opts) opts = {};
@@ -6771,9 +6902,9 @@
 	}
 
 
-/***/ },
-/* 20 */
-/***/ function(module, exports) {
+/***/ }),
+/* 27 */
+/***/ (function(module, exports) {
 
 	exports = module.exports = typeof Object.keys === 'function'
 	  ? Object.keys : shim;
@@ -6786,9 +6917,9 @@
 	}
 
 
-/***/ },
-/* 21 */
-/***/ function(module, exports) {
+/***/ }),
+/* 28 */
+/***/ (function(module, exports) {
 
 	var supportsArgumentsClass = (function(){
 	  return Object.prototype.toString.call(arguments)
@@ -6812,5 +6943,5 @@
 	};
 
 
-/***/ }
+/***/ })
 /******/ ]);
