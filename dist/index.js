@@ -11,6 +11,7 @@ exports.clear = clear;
 var _immutable = require('immutable');
 
 var NAMESPACE_DEFAULT = 'redux_localstorage_simple';
+var debounceTimeout = null;
 
 /**
   Saves specified parts of the Redux state tree into localstorage
@@ -24,6 +25,9 @@ var NAMESPACE_DEFAULT = 'redux_localstorage_simple';
             Properties:
               states (Array of Strings, optional) - States to save e.g. ['user', 'products']
               namespace (String, optional) - Namespace to add before your LocalStorage items
+              debounce (Number, optional) - Debouncing period (in milliseconds) to wait before saving to LocalStorage
+                                            Use this as a performance optimization if you feel you are saving
+                                            to LocalStorage too often. Recommended value: 500 - 1000 milliseconds
 
   Usage examples:
 
@@ -40,10 +44,16 @@ var NAMESPACE_DEFAULT = 'redux_localstorage_simple';
       namespace: 'my_cool_app'
     })
 
+    // save the entire state tree only after a debouncing period of 500 milliseconds has elapsed
+    save({
+      debounce: 500
+    })
+
     // save specific parts of the state tree with the namespace 'my_cool_app'. The keys 'my_cool_app_user' and 'my_cool_app_products' will appear in LocalStorage
     save({
         states: ['user', 'products'],
-        namespace: 'my_cool_app'
+        namespace: 'my_cool_app',
+        debounce: 500
     })
 */
 
@@ -52,19 +62,40 @@ function save() {
       _ref$states = _ref.states,
       states = _ref$states === undefined ? [] : _ref$states,
       _ref$namespace = _ref.namespace,
-      namespace = _ref$namespace === undefined ? NAMESPACE_DEFAULT : _ref$namespace;
+      namespace = _ref$namespace === undefined ? NAMESPACE_DEFAULT : _ref$namespace,
+      _ref$debounce = _ref.debounce,
+      debounce = _ref$debounce === undefined ? null : _ref$debounce;
 
   return function (store) {
     return function (next) {
       return function (action) {
         next(action);
 
-        if (states.length === 0) {
-          localStorage[namespace] = JSON.stringify(store.getState());
+        // Check to see whether to debounce LocalStorage saving
+        if (debounce) {
+          // Clear the debounce timeout if it was previously set
+          if (debounceTimeout) {
+            clearTimeout(debounceTimeout);
+          }
+
+          // Save to LocalStorage after the debounce period has elapsed
+          debounceTimeout = setTimeout(function () {
+            _save(states, namespace);
+          }, debounce);
+          // No debouncing necessary so save to LocalStorage right now
         } else {
-          states.forEach(function (state) {
-            localStorage[namespace + '_' + state] = JSON.stringify(store.getState()[state]);
-          });
+          _save(states, namespace);
+        }
+
+        // Local function to avoid duplication of code above
+        function _save() {
+          if (states.length === 0) {
+            localStorage[namespace] = JSON.stringify(store.getState());
+          } else {
+            states.forEach(function (state) {
+              localStorage[namespace + '_' + state] = JSON.stringify(store.getState()[state]);
+            });
+          }
         }
       };
     };
