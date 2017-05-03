@@ -86,7 +86,7 @@
 	};
 
 	var initialStateReducerB = {
-	  y: 1
+	  y: 0
 	};
 
 	var initialStateReducerImmutable = (0, _immutable.fromJS)({
@@ -193,7 +193,7 @@
 	  // Store which saves to LocalStorage
 	  var _storeA = (0, _redux.applyMiddleware)(_middleware)(_redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), initialStateReducers);
 
-	  // Trigger a save to LocalStorage using a noop action
+	  // Trigger a save to LocalStorage using an append action
 	  _storeA.dispatch({ type: APPEND });
 
 	  // Store which loads from LocalStorage
@@ -237,7 +237,7 @@
 	  // Store which saves to LocalStorage
 	  var _storeA3 = (0, _redux.applyMiddleware)(_middleware3)(_redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), initialStateReducers);
 
-	  // Trigger a save to LocalStorage using a noop action
+	  // Trigger a save to LocalStorage using an append action
 	  _storeA3.dispatch({ type: APPEND });
 
 	  // Store which loads from LocalStorage
@@ -259,7 +259,7 @@
 	  // Store which saves to LocalStorage
 	  var _storeA4 = (0, _redux.applyMiddleware)(_middleware4)(_redux.createStore)(reducerImmutable, initialStateReducerImmutable);
 
-	  // Trigger a save to LocalStorage using a noop action
+	  // Trigger a save to LocalStorage using a multiply action
 	  _storeA4.dispatch({ type: MULTIPLY });
 
 	  // Store which loads from LocalStorage
@@ -350,6 +350,41 @@
 	      outputTestResult('test8', false);
 	    }
 	  }
+	}
+
+	// -------------------------------------------------------------------------------
+	// TEST 9 - Save Redux state with debouncing
+	// -------------------------------------------------------------------------------
+
+	clearTestData();
+
+	{
+	  var debouncingPeriod = 500;
+
+	  // Store that saves with a debouncing period
+	  var _storeA8 = (0, _redux.applyMiddleware)((0, _index.save)({ debounce: debouncingPeriod }))(_redux.createStore)(reducerB, initialStateReducerB);
+	  // Trigger a save to LocalStorage using an add action
+	  _storeA8.dispatch({ type: ADD });
+
+	  // Store which loads from LocalStorage
+	  var _storeB8 = (0, _redux.createStore)(reducerB, (0, _index.load)());
+	  // This test result should fail because the debouncing period has
+	  // delayed the data being written to LocalStorage
+	  var _testResult6 = _storeB8.getState()['y'] === 1;
+	  outputTestResult('test9', _testResult6);
+
+	  // This timeout will recheck LocalStorage after a period longer than
+	  // our specified debouncing period. Therefore it will see the updated
+	  // LocalStorage dataand the test should pass
+	  setTimeout(function () {
+	    // Store which loads from LocalStorage
+	    var storeC = (0, _redux.createStore)(reducerB, (0, _index.load)());
+	    var testResult = storeC.getState()['y'] === 1;
+	    outputTestResult('test9', testResult);
+
+	    // Perform the LocalStorage clearing
+	    (0, _index.clear)();
+	  }, debouncingPeriod + 200);
 	}
 
 	// -------------------------------------------------------------------------------
@@ -6592,6 +6627,7 @@
 	var _immutable = __webpack_require__(24);
 
 	var NAMESPACE_DEFAULT = 'redux_localstorage_simple';
+	var debounceTimeout = null;
 
 	/**
 	  Saves specified parts of the Redux state tree into localstorage
@@ -6605,6 +6641,9 @@
 	            Properties:
 	              states (Array of Strings, optional) - States to save e.g. ['user', 'products']
 	              namespace (String, optional) - Namespace to add before your LocalStorage items
+	              debounce (Number, optional) - Debouncing period (in milliseconds) to wait before saving to LocalStorage
+	                                            Use this as a performance optimization if you feel you are saving
+	                                            to LocalStorage too often. Recommended value: 500 - 1000 milliseconds
 
 	  Usage examples:
 
@@ -6621,10 +6660,16 @@
 	      namespace: 'my_cool_app'
 	    })
 
+	    // save the entire state tree only after a debouncing period of 500 milliseconds has elapsed
+	    save({
+	      debounce: 500
+	    })
+
 	    // save specific parts of the state tree with the namespace 'my_cool_app'. The keys 'my_cool_app_user' and 'my_cool_app_products' will appear in LocalStorage
 	    save({
 	        states: ['user', 'products'],
-	        namespace: 'my_cool_app'
+	        namespace: 'my_cool_app',
+	        debounce: 500
 	    })
 	*/
 
@@ -6633,19 +6678,40 @@
 	      _ref$states = _ref.states,
 	      states = _ref$states === undefined ? [] : _ref$states,
 	      _ref$namespace = _ref.namespace,
-	      namespace = _ref$namespace === undefined ? NAMESPACE_DEFAULT : _ref$namespace;
+	      namespace = _ref$namespace === undefined ? NAMESPACE_DEFAULT : _ref$namespace,
+	      _ref$debounce = _ref.debounce,
+	      debounce = _ref$debounce === undefined ? null : _ref$debounce;
 
 	  return function (store) {
 	    return function (next) {
 	      return function (action) {
 	        next(action);
 
-	        if (states.length === 0) {
-	          localStorage[namespace] = JSON.stringify(store.getState());
+	        // Check to see whether to debounce LocalStorage saving
+	        if (debounce) {
+	          // Clear the debounce timeout if it was previously set
+	          if (debounceTimeout) {
+	            clearTimeout(debounceTimeout);
+	          }
+
+	          // Save to LocalStorage after the debounce period has elapsed
+	          debounceTimeout = setTimeout(function () {
+	            _save(states, namespace);
+	          }, debounce);
+	          // No debouncing necessary so save to LocalStorage right now
 	        } else {
-	          states.forEach(function (state) {
-	            localStorage[namespace + '_' + state] = JSON.stringify(store.getState()[state]);
-	          });
+	          _save(states, namespace);
+	        }
+
+	        // Local function to avoid duplication of code above
+	        function _save() {
+	          if (states.length === 0) {
+	            localStorage[namespace] = JSON.stringify(store.getState());
+	          } else {
+	            states.forEach(function (state) {
+	              localStorage[namespace + '_' + state] = JSON.stringify(store.getState()[state]);
+	            });
+	          }
 	        }
 	      };
 	    };

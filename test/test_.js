@@ -23,7 +23,7 @@ var initialStateReducerA = {
 }
 
 var initialStateReducerB = {
-  y: 1
+  y: 0
 }
 
 var initialStateReducerImmutable = fromJS({
@@ -133,7 +133,7 @@ clearTestData()
     initialStateReducers
   )
 
-  // Trigger a save to LocalStorage using a noop action
+  // Trigger a save to LocalStorage using an append action
   storeA.dispatch({ type: APPEND })
 
   // Store which loads from LocalStorage
@@ -195,7 +195,7 @@ clearTestData()
     initialStateReducers
   )
 
-  // Trigger a save to LocalStorage using a noop action
+  // Trigger a save to LocalStorage using an append action
   storeA.dispatch({ type: APPEND })
 
   // Store which loads from LocalStorage
@@ -226,7 +226,7 @@ clearTestData()
     initialStateReducerImmutable
   )
 
-  // Trigger a save to LocalStorage using a noop action
+  // Trigger a save to LocalStorage using a multiply action
   storeA.dispatch({ type: MULTIPLY })
 
   // Store which loads from LocalStorage
@@ -334,6 +334,41 @@ clearTestData()
       outputTestResult('test8', false)
     }
   }
+}
+
+// -------------------------------------------------------------------------------
+// TEST 9 - Save Redux state with debouncing
+// -------------------------------------------------------------------------------
+
+clearTestData()
+
+{
+  let debouncingPeriod = 500
+
+  // Store that saves with a debouncing period
+  let storeA = applyMiddleware(save({debounce: debouncingPeriod}))(createStore)(reducerB, initialStateReducerB)
+  // Trigger a save to LocalStorage using an add action
+  storeA.dispatch({ type: ADD })
+
+  // Store which loads from LocalStorage
+  let storeB = createStore(reducerB, load())
+  // This test result should fail because the debouncing period has
+  // delayed the data being written to LocalStorage
+  let testResult = storeB.getState()['y'] === 1
+  outputTestResult('test9', testResult)
+
+  // This timeout will recheck LocalStorage after a period longer than
+  // our specified debouncing period. Therefore it will see the updated
+  // LocalStorage dataand the test should pass
+  setTimeout(function () {
+    // Store which loads from LocalStorage
+    let storeC = createStore(reducerB, load())
+    let testResult = storeC.getState()['y'] === 1
+    outputTestResult('test9', testResult)
+
+    // Perform the LocalStorage clearing
+    clear()
+  }, debouncingPeriod + 200)
 }
 
 // -------------------------------------------------------------------------------
