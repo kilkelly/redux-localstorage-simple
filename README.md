@@ -54,12 +54,14 @@ The **save** method takes a optional configuration object as an argument. It has
 ```sh
 {
     [Array states],
-    [String namespace]
+    [String namespace],
+    [Number debounce]
 }
 ```
 
 - states (Array, optional) - This is an optional array of strings specifying which parts of the Redux state tree you would like to save to LocalStorage. e.g. ["user", "products"]. Typically states have identical names to your Redux reducers. If you do not specify any states then your entire Redux state tree will be saved to LocalStorage.
 - namespace (String, optional) - This is an optional string specifying the namespace to add to your LocalStorage items. For example if you have a part of your Redux state tree called "user" and you specify the namespace "my_cool_app", it will be saved to LocalStorage as "my_cool_app_user"
+- debounce (Number, optional) - Debouncing period (in milliseconds) to wait before saving to LocalStorage. Use this as a performance optimization if you feel you are saving to LocalStorage too often. Recommended value: 500 - 1000 milliseconds
 
 #### Examples
 
@@ -79,6 +81,12 @@ Save the entire state tree under the namespace "my_cool_app". The key "my_cool_a
 
 ```sh
 save({ namespace: "my_cool_app" })
+```
+
+Save the entire state tree only after a debouncing period of 500 milliseconds has elapsed
+
+```sh
+save({ debounce: 500 })
 ```
 
 Save specific parts of the state tree with the namespace "my_cool_app". The keys "my_cool_app_user" and "my_cool_app_products" will appear in LocalStorage.
