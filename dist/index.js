@@ -3,6 +3,9 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 exports.save = save;
 exports.load = load;
 exports.combineLoads = combineLoads;
@@ -10,7 +13,11 @@ exports.clear = clear;
 
 var _immutable = require('immutable');
 
+var MODULE_NAME = '[Redux-LocalStorage-Simple]';
 var NAMESPACE_DEFAULT = 'redux_localstorage_simple';
+var STATES_DEFAULT = [];
+var DEBOUNCE_DEFAULT = 0;
+var IMMUTABLEJS_DEFAULT = false;
 var debounceTimeout = null;
 
 /**
@@ -60,16 +67,34 @@ var debounceTimeout = null;
 function save() {
   var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       _ref$states = _ref.states,
-      states = _ref$states === undefined ? [] : _ref$states,
+      states = _ref$states === undefined ? STATES_DEFAULT : _ref$states,
       _ref$namespace = _ref.namespace,
       namespace = _ref$namespace === undefined ? NAMESPACE_DEFAULT : _ref$namespace,
       _ref$debounce = _ref.debounce,
-      debounce = _ref$debounce === undefined ? null : _ref$debounce;
+      debounce = _ref$debounce === undefined ? DEBOUNCE_DEFAULT : _ref$debounce;
 
   return function (store) {
     return function (next) {
       return function (action) {
         next(action);
+
+        // Validate 'states' parameter
+        if (!isArray(states)) {
+          console.error(MODULE_NAME, '\'states\' parameter in \'save()\' method was passed a non-array value. Setting default value instead. Check your \'save()\' method.');
+          states = STATES_DEFAULT;
+        }
+
+        // Validate 'namespace' parameter
+        if (!isString(namespace)) {
+          console.error(MODULE_NAME, '\'namespace\' parameter in \'save()\' method was passed a non-string value. Setting default value instead. Check your \'save()\' method.');
+          namespace = NAMESPACE_DEFAULT;
+        }
+
+        // Validate 'debounce' parameter
+        if (!isInteger(debounce)) {
+          console.error(MODULE_NAME, '\'debounce\' parameter in \'save()\' method was passed a non-integer value. Setting default value instead. Check your \'save()\' method.');
+          debounce = DEBOUNCE_DEFAULT;
+        }
 
         // Check to see whether to debounce LocalStorage saving
         if (debounce) {
@@ -145,11 +170,29 @@ function save() {
 function load() {
   var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       _ref2$states = _ref2.states,
-      states = _ref2$states === undefined ? [] : _ref2$states,
+      states = _ref2$states === undefined ? STATES_DEFAULT : _ref2$states,
       _ref2$immutablejs = _ref2.immutablejs,
-      immutablejs = _ref2$immutablejs === undefined ? false : _ref2$immutablejs,
+      immutablejs = _ref2$immutablejs === undefined ? IMMUTABLEJS_DEFAULT : _ref2$immutablejs,
       _ref2$namespace = _ref2.namespace,
       namespace = _ref2$namespace === undefined ? NAMESPACE_DEFAULT : _ref2$namespace;
+
+  // Validate 'states' parameter
+  if (!isArray(states)) {
+    console.error(MODULE_NAME, '\'states\' parameter in \'load()\' method was passed a non-array value. Setting default value instead. Check your \'load()\' method.');
+    states = STATES_DEFAULT;
+  }
+
+  // Validate 'immutablejs' parameter
+  if (!isBoolean(immutablejs)) {
+    console.error(MODULE_NAME, '\'immutablejs\' parameter in \'load()\' method was passed a non-boolean value. Setting default value instead. Check your \'load()\' method.');
+    immutablejs = IMMUTABLEJS_DEFAULT;
+  }
+
+  // Validate 'namespace' parameter
+  if (!isString(namespace)) {
+    console.error(MODULE_NAME, '\'namespace\' parameter in \'load()\' method was passed a non-string value. Setting default value instead. Check your \'load()\' method.');
+    namespace = NAMESPACE_DEFAULT;
+  }
 
   var loadedState = {};
 
@@ -209,6 +252,12 @@ function combineLoads() {
   }
 
   loads.forEach(function (load) {
+    // Make sure current 'load' is an object
+    if (!isObject(load)) {
+      console.error(MODULE_NAME, 'One or more loads provided to \'combineLoads()\' is not a valid object. Ignoring the invalid load/s. Check your \'combineLoads()\' method.');
+      load = {};
+    }
+
     for (var state in load) {
       combinedLoad[state] = load[state];
     }
@@ -243,10 +292,39 @@ function clear() {
       _ref3$namespace = _ref3.namespace,
       namespace = _ref3$namespace === undefined ? NAMESPACE_DEFAULT : _ref3$namespace;
 
+  // Validate 'namespace' parameter
+  if (!isString(namespace)) {
+    console.error(MODULE_NAME, '\'namespace\' parameter in \'clear()\' method was passed a non-string value. Setting default value instead. Check your \'clear()\' method.');
+    namespace = NAMESPACE_DEFAULT;
+  }
+
   for (var key in localStorage) {
     // key starts with namespace
     if (key.slice(0, namespace.length) === namespace) {
       localStorage.removeItem(key);
     }
   }
+}
+
+// ---------------------------------------------------
+// Utility functions
+
+function isArray(value) {
+  return Object.prototype.toString.call(value) === '[object Array]';
+}
+
+function isString(value) {
+  return typeof value === 'string';
+}
+
+function isInteger(value) {
+  return typeof value === 'number' && isFinite(value) && Math.floor(value) === value;
+}
+
+function isBoolean(value) {
+  return typeof value === 'boolean';
+}
+
+function isObject(value) {
+  return value !== null && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object';
 }

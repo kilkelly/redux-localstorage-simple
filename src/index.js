@@ -2,7 +2,11 @@
 
 import { fromJS } from 'immutable'
 
+const MODULE_NAME = '[Redux-LocalStorage-Simple]'
 const NAMESPACE_DEFAULT = 'redux_localstorage_simple'
+const STATES_DEFAULT = []
+const DEBOUNCE_DEFAULT = 0
+const IMMUTABLEJS_DEFAULT = false
 let debounceTimeout = null
 
 /**
@@ -50,12 +54,30 @@ let debounceTimeout = null
 */
 
 export function save ({
-      states = [],
+      states = STATES_DEFAULT,
       namespace = NAMESPACE_DEFAULT,
-      debounce = null
+      debounce = DEBOUNCE_DEFAULT
     } = {}) {
   return store => next => action => {
     next(action)
+
+    // Validate 'states' parameter
+    if (!isArray(states)) {
+      console.error(MODULE_NAME, '\'states\' parameter in \'save()\' method was passed a non-array value. Setting default value instead. Check your \'save()\' method.')
+      states = STATES_DEFAULT
+    }
+
+    // Validate 'namespace' parameter
+    if (!isString(namespace)) {
+      console.error(MODULE_NAME, '\'namespace\' parameter in \'save()\' method was passed a non-string value. Setting default value instead. Check your \'save()\' method.')
+      namespace = NAMESPACE_DEFAULT
+    }
+
+    // Validate 'debounce' parameter
+    if (!isInteger(debounce)) {
+      console.error(MODULE_NAME, '\'debounce\' parameter in \'save()\' method was passed a non-integer value. Setting default value instead. Check your \'save()\' method.')
+      debounce = DEBOUNCE_DEFAULT
+    }
 
     // Check to see whether to debounce LocalStorage saving
     if (debounce) {
@@ -126,7 +148,29 @@ export function save ({
 
 */
 
-export function load ({ states = [], immutablejs = false, namespace = NAMESPACE_DEFAULT } = {}) {
+export function load ({
+      states = STATES_DEFAULT,
+      immutablejs = IMMUTABLEJS_DEFAULT,
+      namespace = NAMESPACE_DEFAULT
+    } = {}) {
+  // Validate 'states' parameter
+  if (!isArray(states)) {
+    console.error(MODULE_NAME, '\'states\' parameter in \'load()\' method was passed a non-array value. Setting default value instead. Check your \'load()\' method.')
+    states = STATES_DEFAULT
+  }
+
+  // Validate 'immutablejs' parameter
+  if (!isBoolean(immutablejs)) {
+    console.error(MODULE_NAME, '\'immutablejs\' parameter in \'load()\' method was passed a non-boolean value. Setting default value instead. Check your \'load()\' method.')
+    immutablejs = IMMUTABLEJS_DEFAULT
+  }
+
+  // Validate 'namespace' parameter
+  if (!isString(namespace)) {
+    console.error(MODULE_NAME, '\'namespace\' parameter in \'load()\' method was passed a non-string value. Setting default value instead. Check your \'load()\' method.')
+    namespace = NAMESPACE_DEFAULT
+  }
+
   let loadedState = {}
 
   if (states.length === 0) {
@@ -181,6 +225,12 @@ export function combineLoads (...loads) {
   let combinedLoad = {}
 
   loads.forEach(load => {
+    // Make sure current 'load' is an object
+    if (!isObject(load)) {
+      console.error(MODULE_NAME, 'One or more loads provided to \'combineLoads()\' is not a valid object. Ignoring the invalid load/s. Check your \'combineLoads()\' method.')
+      load = {}
+    }
+
     for (let state in load) {
       combinedLoad[state] = load[state]
     }
@@ -211,10 +261,41 @@ export function combineLoads (...loads) {
 */
 
 export function clear ({ namespace = NAMESPACE_DEFAULT } = {}) {
+  // Validate 'namespace' parameter
+  if (!isString(namespace)) {
+    console.error(MODULE_NAME, '\'namespace\' parameter in \'clear()\' method was passed a non-string value. Setting default value instead. Check your \'clear()\' method.')
+    namespace = NAMESPACE_DEFAULT
+  }
+
   for (let key in localStorage) {
     // key starts with namespace
     if (key.slice(0, namespace.length) === namespace) {
       localStorage.removeItem(key)
     }
   }
+}
+
+// ---------------------------------------------------
+// Utility functions
+
+function isArray (value) {
+  return Object.prototype.toString.call(value) === '[object Array]'
+}
+
+function isString (value) {
+  return typeof value === 'string'
+}
+
+function isInteger (value) {
+  return typeof value === 'number' &&
+    isFinite(value) &&
+    Math.floor(value) === value
+}
+
+function isBoolean (value) {
+  return typeof value === 'boolean'
+}
+
+function isObject (value) {
+  return value !== null && typeof value === 'object'
 }
