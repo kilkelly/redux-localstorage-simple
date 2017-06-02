@@ -1,5 +1,7 @@
 'use strict';
 
+// import { fromJS } from 'immutable'
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -10,9 +12,6 @@ exports.save = save;
 exports.load = load;
 exports.combineLoads = combineLoads;
 exports.clear = clear;
-
-var _immutable = require('immutable');
-
 var MODULE_NAME = '[Redux-LocalStorage-Simple]';
 var NAMESPACE_DEFAULT = 'redux_localstorage_simple';
 var STATES_DEFAULT = [];
@@ -200,9 +199,9 @@ function load() {
     if (localStorage[namespace]) {
       loadedState = JSON.parse(localStorage[namespace]);
 
-      if (immutablejs) {
-        loadedState = (0, _immutable.fromJS)(loadedState);
-      }
+      /*      if (immutablejs) {
+              loadedState = fromJS(loadedState)
+            }*/
     }
   } else {
     states.forEach(function (state) {
@@ -211,11 +210,11 @@ function load() {
       }
     });
 
-    if (immutablejs) {
-      for (var key in loadedState) {
-        loadedState[key] = (0, _immutable.fromJS)(loadedState[key]);
-      }
-    }
+    /*    if (immutablejs) {
+          for (let key in loadedState) {
+            loadedState[key] = fromJS(loadedState[key])
+          }
+        }*/
   }
 
   return loadedState;
