@@ -1,6 +1,6 @@
 'use strict'
 
-import { fromJS } from 'immutable'
+// import { fromJS } from 'immutable'
 
 const MODULE_NAME = '[Redux-LocalStorage-Simple]'
 const NAMESPACE_DEFAULT = 'redux_localstorage_simple'
@@ -177,9 +177,9 @@ export function load ({
     if (localStorage[namespace]) {
       loadedState = JSON.parse(localStorage[namespace])
 
-      if (immutablejs) {
+/*      if (immutablejs) {
         loadedState = fromJS(loadedState)
-      }
+      }*/
     }
   } else {
     states.forEach(function (state) {
@@ -188,11 +188,11 @@ export function load ({
       }
     })
 
-    if (immutablejs) {
+/*    if (immutablejs) {
       for (let key in loadedState) {
         loadedState[key] = fromJS(loadedState[key])
       }
-    }
+    }*/
   }
 
   return loadedState
