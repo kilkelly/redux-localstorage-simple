@@ -1,6 +1,7 @@
 'use strict'
 
 import { fromJS } from 'immutable'
+import objectMerge from 'object-merge';
 
 const MODULE_NAME = '[Redux-LocalStorage-Simple]'
 const NAMESPACE_DEFAULT = 'redux_localstorage_simple'
@@ -8,6 +9,31 @@ const STATES_DEFAULT = []
 const DEBOUNCE_DEFAULT = 0
 const IMMUTABLEJS_DEFAULT = false
 let debounceTimeout = null
+
+// ---------------------------------------------------
+
+function lensPath (path, obj) {
+  if (path.length === 1) {
+    return obj[path[0]]
+  } else {
+    return lensPath(path.slice(1), obj[path[0]])
+  }
+}
+
+// ---------------------------------------------------
+
+function realiseObject(path, objectInitial = {}) {
+  function realiseObject_(pathArr, objectInProgress) {
+      if (pathArr.length === 0) {
+        return objectInProgress
+      } else {
+        return realiseObject_(pathArr.slice(1), {[pathArr[0]]: objectInProgress})
+      }
+  }
+  return realiseObject_(path.split('.').reverse(), objectInitial)
+}
+
+// ---------------------------------------------------
 
 /**
   Saves specified parts of the Redux state tree into localstorage
@@ -95,13 +121,23 @@ export function save ({
       _save(states, namespace)
     }
 
+    function getStateForLocalStorage (state, rootState) {
+      const delimiter = '.'
+
+      if (state.split(delimiter).length > 1) {
+        return lensPath(state.split(delimiter), rootState)
+      } else {
+        return lensPath([state], rootState)
+      }
+    }
+ 
     // Local function to avoid duplication of code above
     function _save () {
       if (states.length === 0) {
         localStorage[namespace] = JSON.stringify(store.getState())
       } else {
         states.forEach(state => {
-          localStorage[namespace + '_' + state] = JSON.stringify(store.getState()[state])
+          localStorage[namespace + '_' + state] = JSON.stringify(getStateForLocalStorage(state, store.getState()))
         })
       }
     }
@@ -184,7 +220,9 @@ export function load ({
   } else {
     states.forEach(function (state) {
       if (localStorage[namespace + '_' + state]) {
-        loadedState[state] = JSON.parse(localStorage[namespace + '_' + state])
+        loadedState = objectMerge(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + '_' + state])))
+      } else {
+        console.error(MODULE_NAME, "Invalid load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'")
       }
     })
 
@@ -229,7 +267,7 @@ export function combineLoads (...loads) {
     if (!isObject(load)) {
       console.error(MODULE_NAME, 'One or more loads provided to \'combineLoads()\' is not a valid object. Ignoring the invalid load/s. Check your \'combineLoads()\' method.')
       load = {}
-    }
+    }    
 
     for (let state in load) {
       combinedLoad[state] = load[state]

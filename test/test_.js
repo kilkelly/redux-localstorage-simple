@@ -14,6 +14,7 @@ const NAMESPACE_TEST = 'namespace_test'
 var APPEND = 'APPEND'
 var ADD = 'ADD'
 var MULTIPLY = 'MULTIPLY'
+var MODIFY = 'MODIFY'
 var NOOP = 'NOOP'
 
 // -------------------------------------------------------------------------------
@@ -24,6 +25,16 @@ var initialStateReducerA = {
 
 var initialStateReducerB = {
   y: 0
+}
+
+var initialStateReducerMultipleLevels = {
+  setting1: false,
+  setting2: false,
+  setting3: {
+    level1: {
+      level2: 'hello'
+    }
+  }
 }
 
 var initialStateReducerImmutable = fromJS({
@@ -37,8 +48,11 @@ var initialStateReducers = {
 
 var initialStateReducersPlusImmutable = {
   reducerA: initialStateReducerA,
-  reducerB: initialStateReducerB,
-  reducerImmutable: initialStateReducerImmutable
+  reducerB: initialStateReducerB
+}
+
+var initialStateReducersPlusMultipleLevels = {
+  reducerMultipleLevels: initialStateReducerMultipleLevels
 }
 
 // -------------------------------------------------------------------------------
@@ -71,6 +85,26 @@ var reducerImmutable = function (state = initialStateReducerImmutable, action) {
   switch (action.type) {
     case MULTIPLY:
       return state.set('z', state.get('z') * 2)
+    default:
+      return state
+  }
+}
+
+var reducerMultipleLevels = function (state = initialStateReducerMultipleLevels, action) {
+  console.log('state', state)
+  switch (action.type) {
+    case MODIFY:
+      return {
+        setting1: true,
+        setting2: true,
+        setting3: {
+          level1: {
+            level2: 'hellothere'
+          }
+        }
+      }
+    case NOOP:
+      return state
     default:
       return state
   }
@@ -251,7 +285,7 @@ clearTestData()
 clearTestData()
 
 {
-  let middleware = save()
+  let middleware = save({ states: ['reducerA', 'reducerB', 'reducerImmutable'] })
 
   // Store which saves to LocalStorage
   let storeA = applyMiddleware(middleware)(createStore)(
@@ -369,6 +403,41 @@ clearTestData()
     // Perform the LocalStorage clearing
     clear()
   }, debouncingPeriod + 200)
+}
+
+// -------------------------------------------------------------------------------
+// TEST 10 - Save and load part of the Redux state tree under a specified namespace
+// -------------------------------------------------------------------------------
+clearTestData()
+
+{
+  let middleware = save({ states: ['reducerMultipleLevels.setting1'], namespace: NAMESPACE_TEST })
+
+  // Store which saves to LocalStorage
+  let storeA = applyMiddleware(middleware)(createStore)(
+    combineReducers({ reducerMultipleLevels }),
+    initialStateReducersPlusMultipleLevels
+  )
+
+  console.log('yo')
+
+  storeA.dispatch({ type: MODIFY })
+
+  // Store which loads from LocalStorage
+  let storeB = createStore(
+    combineReducers({ reducerMultipleLevels }),
+    load({ states: ['reducerMultipleLevels.setting1'], namespace: NAMESPACE_TEST })
+  )
+
+  let testResult = equal(
+    storeA.getState(),
+    storeB.getState()
+  )
+
+  console.log('storeA.getState()', storeA.getState())
+  console.log('storeB.getState()', storeB.getState())
+
+  outputTestResult('test10', testResult)
 }
 
 // -------------------------------------------------------------------------------

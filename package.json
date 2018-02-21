@@ -25,7 +25,8 @@
   },
   "homepage": "https://github.com/kilkelly/redux-localstorage-simple#readme",
   "dependencies": {
-    "immutable": "^3.8.1"
+    "immutable": "^3.8.1",
+    "object-merge": "^2.5.1"
   },
   "devDependencies": {
     "babel-cli": "^6.9.0",

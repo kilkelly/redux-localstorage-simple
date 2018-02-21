@@ -62,7 +62,7 @@
 
 	var _index = __webpack_require__(25);
 
-	var _deepEqual = __webpack_require__(26);
+	var _deepEqual = __webpack_require__(29);
 
 	var _deepEqual2 = _interopRequireDefault(_deepEqual);
 
@@ -77,6 +77,7 @@
 	var APPEND = 'APPEND';
 	var ADD = 'ADD';
 	var MULTIPLY = 'MULTIPLY';
+	var MODIFY = 'MODIFY';
 	var NOOP = 'NOOP';
 
 	// -------------------------------------------------------------------------------
@@ -87,6 +88,16 @@
 
 	var initialStateReducerB = {
 	  y: 0
+	};
+
+	var initialStateReducerMultipleLevels = {
+	  setting1: false,
+	  setting2: false,
+	  setting3: {
+	    level1: {
+	      level2: 'hello'
+	    }
+	  }
 	};
 
 	var initialStateReducerImmutable = (0, _immutable.fromJS)({
@@ -100,8 +111,11 @@
 
 	var initialStateReducersPlusImmutable = {
 	  reducerA: initialStateReducerA,
-	  reducerB: initialStateReducerB,
-	  reducerImmutable: initialStateReducerImmutable
+	  reducerB: initialStateReducerB
+	};
+
+	var initialStateReducersPlusMultipleLevels = {
+	  reducerMultipleLevels: initialStateReducerMultipleLevels
 	};
 
 	// -------------------------------------------------------------------------------
@@ -143,6 +157,29 @@
 	  switch (action.type) {
 	    case MULTIPLY:
 	      return state.set('z', state.get('z') * 2);
+	    default:
+	      return state;
+	  }
+	};
+
+	var reducerMultipleLevels = function reducerMultipleLevels() {
+	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialStateReducerMultipleLevels;
+	  var action = arguments[1];
+
+	  console.log('state', state);
+	  switch (action.type) {
+	    case MODIFY:
+	      return {
+	        setting1: true,
+	        setting2: true,
+	        setting3: {
+	          level1: {
+	            level2: 'hellothere'
+	          }
+	        }
+	      };
+	    case NOOP:
+	      return state;
 	    default:
 	      return state;
 	  }
@@ -278,7 +315,7 @@
 	clearTestData();
 
 	{
-	  var _middleware5 = (0, _index.save)();
+	  var _middleware5 = (0, _index.save)({ states: ['reducerA', 'reducerB', 'reducerImmutable'] });
 
 	  // Store which saves to LocalStorage
 	  var _storeA5 = (0, _redux.applyMiddleware)(_middleware5)(_redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB, reducerImmutable: reducerImmutable }), initialStateReducersPlusImmutable);
@@ -385,6 +422,32 @@
 	    // Perform the LocalStorage clearing
 	    (0, _index.clear)();
 	  }, debouncingPeriod + 200);
+	}
+
+	// -------------------------------------------------------------------------------
+	// TEST 10 - Save and load part of the Redux state tree under a specified namespace
+	// -------------------------------------------------------------------------------
+	clearTestData();
+
+	{
+	  var _middleware6 = (0, _index.save)({ states: ['reducerMultipleLevels.setting1'], namespace: NAMESPACE_TEST });
+
+	  // Store which saves to LocalStorage
+	  var _storeA9 = (0, _redux.applyMiddleware)(_middleware6)(_redux.createStore)((0, _redux.combineReducers)({ reducerMultipleLevels: reducerMultipleLevels }), initialStateReducersPlusMultipleLevels);
+
+	  console.log('yo');
+
+	  _storeA9.dispatch({ type: MODIFY });
+
+	  // Store which loads from LocalStorage
+	  var _storeB9 = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerMultipleLevels: reducerMultipleLevels }), (0, _index.load)({ states: ['reducerMultipleLevels.setting1'], namespace: NAMESPACE_TEST }));
+
+	  var _testResult7 = (0, _deepEqual2.default)(_storeA9.getState(), _storeB9.getState());
+
+	  console.log('storeA.getState()', _storeA9.getState());
+	  console.log('storeB.getState()', _storeB9.getState());
+
+	  outputTestResult('test10', _testResult7);
 	}
 
 	// -------------------------------------------------------------------------------
@@ -6629,12 +6692,47 @@
 
 	var _immutable = __webpack_require__(24);
 
+	var _objectMerge = __webpack_require__(26);
+
+	var _objectMerge2 = _interopRequireDefault(_objectMerge);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 	var MODULE_NAME = '[Redux-LocalStorage-Simple]';
 	var NAMESPACE_DEFAULT = 'redux_localstorage_simple';
 	var STATES_DEFAULT = [];
 	var DEBOUNCE_DEFAULT = 0;
 	var IMMUTABLEJS_DEFAULT = false;
 	var debounceTimeout = null;
+
+	// ---------------------------------------------------
+
+	function lensPath(path, obj) {
+	  if (path.length === 1) {
+	    return obj[path[0]];
+	  } else {
+	    return lensPath(path.slice(1), obj[path[0]]);
+	  }
+	}
+
+	// ---------------------------------------------------
+
+	function realiseObject(path) {
+	  var objectInitial = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+	  function realiseObject_(pathArr, objectInProgress) {
+	    if (pathArr.length === 0) {
+	      return objectInProgress;
+	    } else {
+	      return realiseObject_(pathArr.slice(1), _defineProperty({}, pathArr[0], objectInProgress));
+	    }
+	  }
+	  return realiseObject_(path.split('.').reverse(), objectInitial);
+	}
+
+	// ---------------------------------------------------
 
 	/**
 	  Saves specified parts of the Redux state tree into localstorage
@@ -6728,13 +6826,23 @@
 	          _save(states, namespace);
 	        }
 
+	        function getStateForLocalStorage(state, rootState) {
+	          var delimiter = '.';
+
+	          if (state.split(delimiter).length > 1) {
+	            return lensPath(state.split(delimiter), rootState);
+	          } else {
+	            return lensPath([state], rootState);
+	          }
+	        }
+
 	        // Local function to avoid duplication of code above
 	        function _save() {
 	          if (states.length === 0) {
 	            localStorage[namespace] = JSON.stringify(store.getState());
 	          } else {
 	            states.forEach(function (state) {
-	              localStorage[namespace + '_' + state] = JSON.stringify(store.getState()[state]);
+	              localStorage[namespace + '_' + state] = JSON.stringify(getStateForLocalStorage(state, store.getState()));
 	            });
 	          }
 	        }
@@ -6823,7 +6931,9 @@
 	  } else {
 	    states.forEach(function (state) {
 	      if (localStorage[namespace + '_' + state]) {
-	        loadedState[state] = JSON.parse(localStorage[namespace + '_' + state]);
+	        loadedState = (0, _objectMerge2.default)(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + '_' + state])));
+	      } else {
+	        console.error(MODULE_NAME, "Invalid load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'");
 	      }
 	    });
 
@@ -6949,9 +7059,292 @@
 /* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	/*
+	License gpl-3.0 http://www.gnu.org/licenses/gpl-3.0-standalone.html
+	*/
+	/*jslint
+	    white: true,
+	    vars: true,
+	    node: true
+	*/
+	function ObjectMergeOptions(opts) {
+	    'use strict';
+	    opts = opts || {};
+	    this.depth = opts.depth || false;
+	    // circular ref check is true unless explicitly set to false
+	    // ignore the jslint warning here, it's pointless.
+	    this.throwOnCircularRef = 'throwOnCircularRef' in opts && opts.throwOnCircularRef === false ? false : true;
+	}
+	/*jslint unparam:true*/
+	/**
+	 * Creates a new options object suitable for use with objectMerge.
+	 * @memberOf objectMerge
+	 * @param {Object} [opts] An object specifying the options.
+	 * @param {Object} [opts.depth = false] Specifies the depth to traverse objects
+	 *  during merging. If this is set to false then there will be no depth limit.
+	 * @param {Object} [opts.throwOnCircularRef = true] Set to false to suppress
+	 *  errors on circular references.
+	 * @returns {ObjectMergeOptions} Returns an instance of ObjectMergeOptions
+	 *  to be used with objectMerge.
+	 * @example
+	 *  var opts = objectMerge.createOptions({
+	 *      depth : 2,
+	 *      throwOnCircularRef : false
+	 *  });
+	 *  var obj1 = {
+	 *      a1 : {
+	 *          a2 : {
+	 *              a3 : {}
+	 *          }
+	 *      }
+	 *  };
+	 *  var obj2 = {
+	 *      a1 : {
+	 *          a2 : {
+	 *              a3 : 'will not be in output'
+	 *          },
+	 *          a22 : {}
+	 *      }
+	 *  };
+	 *  objectMerge(opts, obj1, obj2);
+	 */
+	function createOptions(opts) {
+	    'use strict';
+	    var argz = Array.prototype.slice.call(arguments, 0);
+	    argz.unshift(null);
+	    var F = ObjectMergeOptions.bind.apply(ObjectMergeOptions, argz);
+	    return new F();
+	}
+	/*jslint unparam:false*/
+	/**
+	 * Merges JavaScript objects recursively without altering the objects merged.
+	 * @namespace Merges JavaScript objects recursively without altering the objects merged.
+	 * @author <a href="mailto:matthewkastor@gmail.com">Matthew Kastor</a>
+	 * @param {ObjectMergeOptions} [opts] An options object created by 
+	 *  objectMerge.createOptions. Options must be specified as the first argument
+	 *  and must be an object created with createOptions or else the object will
+	 *  not be recognized as an options object and will be merged instead.
+	 * @param {Object} shadows [[shadows]...] One or more objects to merge. Each
+	 *  argument given will be treated as an object to merge. Each object
+	 *  overwrites the previous objects descendant properties if the property name
+	 *  matches. If objects properties are objects they will be merged recursively
+	 *  as well.
+	 * @returns {Object} Returns a single merged object composed from clones of the
+	 *  input objects.
+	 * @example
+	 *  var objectMerge = require('object-merge');
+	 *  var x = {
+	 *      a : 'a',
+	 *      b : 'b',
+	 *      c : {
+	 *          d : 'd',
+	 *          e : 'e',
+	 *          f : {
+	 *              g : 'g'
+	 *          }
+	 *      }
+	 *  };
+	 *  var y = {
+	 *      a : '`a',
+	 *      b : '`b',
+	 *      c : {
+	 *          d : '`d'
+	 *      }
+	 *  };
+	 *  var z = {
+	 *      a : {
+	 *          b : '``b'
+	 *      },
+	 *      fun : function foo () {
+	 *          return 'foo';
+	 *      },
+	 *      aps : Array.prototype.slice
+	 *  };
+	 *  var out = objectMerge(x, y, z);
+	 *  // out.a will be {
+	 *  //         b : '``b'
+	 *  //     }
+	 *  // out.b will be '`b'
+	 *  // out.c will be {
+	 *  //         d : '`d',
+	 *  //         e : 'e',
+	 *  //         f : {
+	 *  //             g : 'g'
+	 *  //         }
+	 *  //     }
+	 *  // out.fun will be a clone of z.fun
+	 *  // out.aps will be equal to z.aps
+	 */
+	function objectMerge(shadows) {
+	    'use strict';
+	    var objectForeach = __webpack_require__(27);
+	    var cloneFunction = __webpack_require__(28);
+	    // this is the queue of visited objects / properties.
+	    var visited = [];
+	    // various merge options
+	    var options = {};
+	    // gets the sequential trailing objects from array.
+	    function getShadowObjects(shadows) {
+	        var out = shadows.reduce(function (collector, shadow) {
+	                if (shadow instanceof Object) {
+	                    collector.push(shadow);
+	                } else {
+	                    collector = [];
+	                }
+	                return collector;
+	            }, []);
+	        return out;
+	    }
+	    // gets either a new object of the proper type or the last primitive value
+	    function getOutputObject(shadows) {
+	        var out;
+	        var lastShadow = shadows[shadows.length - 1];
+	        if (lastShadow instanceof Array) {
+	            out = [];
+	        } else if (lastShadow instanceof Function) {
+	            try {
+	                out = cloneFunction(lastShadow);
+	            } catch (e) {
+	                throw new Error(e.message);
+	            }
+	        } else if (lastShadow instanceof Object) {
+	            out = {};
+	        } else {
+	            // lastShadow is a primitive value;
+	            out = lastShadow;
+	        }
+	        return out;
+	    }
+	    // checks for circular references
+	    function circularReferenceCheck(shadows) {
+	        // if any of the current objects to process exist in the queue
+	        // then throw an error.
+	        shadows.forEach(function (item) {
+	            if (item instanceof Object && visited.indexOf(item) > -1) {
+	                throw new Error('Circular reference error');
+	            }
+	        });
+	        // if none of the current objects were in the queue
+	        // then add references to the queue.
+	        visited = visited.concat(shadows);
+	    }
+	    function objectMergeRecursor(shadows, currentDepth) {
+	        if (options.depth !== false) {
+	            currentDepth = currentDepth ? currentDepth + 1 : 1;
+	        } else {
+	            currentDepth = 0;
+	        }
+	        if (options.throwOnCircularRef === true) {
+	            circularReferenceCheck(shadows);
+	        }
+	        var out = getOutputObject(shadows);
+	        /*jslint unparam: true */
+	        function shadowHandler(val, prop, shadow) {
+	            if (out[prop]) {
+	                out[prop] = objectMergeRecursor([
+	                    out[prop],
+	                    shadow[prop]
+	                ], currentDepth);
+	            } else {
+	                out[prop] = objectMergeRecursor([shadow[prop]], currentDepth);
+	            }
+	        }
+	        /*jslint unparam:false */
+	        function shadowMerger(shadow) {
+	            objectForeach(shadow, shadowHandler);
+	        }
+	        // short circuits case where output would be a primitive value
+	        // anyway.
+	        if (out instanceof Object && currentDepth <= options.depth) {
+	            // only merges trailing objects since primitives would wipe out
+	            // previous objects, as in merging {a:'a'}, 'a', and {b:'b'}
+	            // would result in {b:'b'} so the first two arguments
+	            // can be ignored completely.
+	            var relevantShadows = getShadowObjects(shadows);
+	            relevantShadows.forEach(shadowMerger);
+	        }
+	        return out;
+	    }
+	    // determines whether an options object was passed in and
+	    // uses it if present
+	    // ignore the jslint warning here too.
+	    if (arguments[0] instanceof ObjectMergeOptions) {
+	        options = arguments[0];
+	        shadows = Array.prototype.slice.call(arguments, 1);
+	    } else {
+	        options = createOptions();
+	        shadows = Array.prototype.slice.call(arguments, 0);
+	    }
+	    return objectMergeRecursor(shadows);
+	}
+	objectMerge.createOptions = createOptions;
+	module.exports = objectMerge;
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports) {
+
+	/**
+	 * Executes a function on each of an objects own enumerable properties. The
+	 *  callback function will receive three arguments: the value of the current
+	 *  property, the name of the property, and the object being processed. This is
+	 *  roughly equivalent to the signature for callbacks to
+	 *  Array.prototype.forEach.
+	 * @param {Object} obj The object to act on.
+	 * @param {Function} callback The function to execute.
+	 * @returns {Object} Returns the given object.
+	 */
+	function objectForeach(obj, callback) {
+	    "use strict";
+	    Object.keys(obj).forEach(function (prop) {
+	        callback(obj[prop], prop, obj);
+	    });
+	    return obj;
+	};
+	module.exports = objectForeach;
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports) {
+
+	/*
+	License gpl-3.0 http://www.gnu.org/licenses/gpl-3.0-standalone.html
+	*/
+	/*jslint
+	    evil: true,
+	    node: true
+	*/
+	'use strict';
+	/**
+	 * Clones non native JavaScript functions, or references native functions.
+	 * @author <a href="mailto:matthewkastor@gmail.com">Matthew Kastor</a>
+	 * @param {Function} func The function to clone.
+	 * @returns {Function} Returns a clone of the non native function, or a
+	 *  reference to the native function.
+	 */
+	function cloneFunction(func) {
+	    var out, str;
+	    try {
+	        str = func.toString();
+	        if (/\[native code\]/.test(str)) {
+	            out = func;
+	        } else {
+	            out = eval('(function(){return ' + str + '}());');
+	        }
+	    } catch (e) {
+	        throw new Error(e.message + '\r\n\r\n' + str);
+	    }
+	    return out;
+	}
+	module.exports = cloneFunction;
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	var pSlice = Array.prototype.slice;
-	var objectKeys = __webpack_require__(27);
-	var isArguments = __webpack_require__(28);
+	var objectKeys = __webpack_require__(30);
+	var isArguments = __webpack_require__(31);
 
 	var deepEqual = module.exports = function (actual, expected, opts) {
 	  if (!opts) opts = {};
@@ -7046,7 +7439,7 @@
 
 
 /***/ }),
-/* 27 */
+/* 30 */
 /***/ (function(module, exports) {
 
 	exports = module.exports = typeof Object.keys === 'function'
@@ -7061,7 +7454,7 @@
 
 
 /***/ }),
-/* 28 */
+/* 31 */
 /***/ (function(module, exports) {
 
 	var supportsArgumentsClass = (function(){

@@ -13,12 +13,47 @@ exports.clear = clear;
 
 var _immutable = require('immutable');
 
+var _objectMerge = require('object-merge');
+
+var _objectMerge2 = _interopRequireDefault(_objectMerge);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var MODULE_NAME = '[Redux-LocalStorage-Simple]';
 var NAMESPACE_DEFAULT = 'redux_localstorage_simple';
 var STATES_DEFAULT = [];
 var DEBOUNCE_DEFAULT = 0;
 var IMMUTABLEJS_DEFAULT = false;
 var debounceTimeout = null;
+
+// ---------------------------------------------------
+
+function lensPath(path, obj) {
+  if (path.length === 1) {
+    return obj[path[0]];
+  } else {
+    return lensPath(path.slice(1), obj[path[0]]);
+  }
+}
+
+// ---------------------------------------------------
+
+function realiseObject(path) {
+  var objectInitial = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  function realiseObject_(pathArr, objectInProgress) {
+    if (pathArr.length === 0) {
+      return objectInProgress;
+    } else {
+      return realiseObject_(pathArr.slice(1), _defineProperty({}, pathArr[0], objectInProgress));
+    }
+  }
+  return realiseObject_(path.split('.').reverse(), objectInitial);
+}
+
+// ---------------------------------------------------
 
 /**
   Saves specified parts of the Redux state tree into localstorage
@@ -112,13 +147,23 @@ function save() {
           _save(states, namespace);
         }
 
+        function getStateForLocalStorage(state, rootState) {
+          var delimiter = '.';
+
+          if (state.split(delimiter).length > 1) {
+            return lensPath(state.split(delimiter), rootState);
+          } else {
+            return lensPath([state], rootState);
+          }
+        }
+
         // Local function to avoid duplication of code above
         function _save() {
           if (states.length === 0) {
             localStorage[namespace] = JSON.stringify(store.getState());
           } else {
             states.forEach(function (state) {
-              localStorage[namespace + '_' + state] = JSON.stringify(store.getState()[state]);
+              localStorage[namespace + '_' + state] = JSON.stringify(getStateForLocalStorage(state, store.getState()));
             });
           }
         }
@@ -207,7 +252,9 @@ function load() {
   } else {
     states.forEach(function (state) {
       if (localStorage[namespace + '_' + state]) {
-        loadedState[state] = JSON.parse(localStorage[namespace + '_' + state]);
+        loadedState = (0, _objectMerge2.default)(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + '_' + state])));
+      } else {
+        console.error(MODULE_NAME, "Invalid load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'");
       }
     });
 
