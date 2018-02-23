@@ -91,15 +91,14 @@ var reducerImmutable = function (state = initialStateReducerImmutable, action) {
 }
 
 var reducerMultipleLevels = function (state = initialStateReducerMultipleLevels, action) {
-  console.log('state', state)
   switch (action.type) {
     case MODIFY:
       return {
-        setting1: true,
+        setting1: false,
         setting2: true,
         setting3: {
           level1: {
-            level2: 'hellothere'
+            level2: 'hello'
           }
         }
       }
@@ -406,12 +405,18 @@ clearTestData()
 }
 
 // -------------------------------------------------------------------------------
-// TEST 10 - Save and load part of the Redux state tree under a specified namespace
+// TEST 10 - Save and load specific properties of a <u>part</u> of Redux state tree under a specified <u>namespace</u>
 // -------------------------------------------------------------------------------
 clearTestData()
 
 {
-  let middleware = save({ states: ['reducerMultipleLevels.setting1'], namespace: NAMESPACE_TEST })
+
+  let states = [
+    'reducerMultipleLevels.setting1',
+    'reducerMultipleLevels.setting3.level1.level2'
+  ]
+
+  let middleware = save({ states: states, namespace: NAMESPACE_TEST })
 
   // Store which saves to LocalStorage
   let storeA = applyMiddleware(middleware)(createStore)(
@@ -419,23 +424,22 @@ clearTestData()
     initialStateReducersPlusMultipleLevels
   )
 
-  console.log('yo')
-
-  storeA.dispatch({ type: MODIFY })
+  storeA.dispatch({ type: NOOP })
 
   // Store which loads from LocalStorage
   let storeB = createStore(
     combineReducers({ reducerMultipleLevels }),
-    load({ states: ['reducerMultipleLevels.setting1'], namespace: NAMESPACE_TEST })
+    load({
+      states: states,
+      namespace: NAMESPACE_TEST,
+      preloadedState: initialStateReducersPlusMultipleLevels
+    })
   )
 
   let testResult = equal(
     storeA.getState(),
     storeB.getState()
   )
-
-  console.log('storeA.getState()', storeA.getState())
-  console.log('storeB.getState()', storeB.getState())
 
   outputTestResult('test10', testResult)
 }

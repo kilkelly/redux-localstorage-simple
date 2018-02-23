@@ -42,14 +42,14 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(1);
 
 
-/***/ }),
+/***/ },
 /* 1 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -166,15 +166,14 @@
 	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialStateReducerMultipleLevels;
 	  var action = arguments[1];
 
-	  console.log('state', state);
 	  switch (action.type) {
 	    case MODIFY:
 	      return {
-	        setting1: true,
+	        setting1: false,
 	        setting2: true,
 	        setting3: {
 	          level1: {
-	            level2: 'hellothere'
+	            level2: 'hello'
 	          }
 	        }
 	      };
@@ -425,27 +424,29 @@
 	}
 
 	// -------------------------------------------------------------------------------
-	// TEST 10 - Save and load part of the Redux state tree under a specified namespace
+	// TEST 10 - Save and load specific properties of a <u>part</u> of Redux state tree under a specified <u>namespace</u>
 	// -------------------------------------------------------------------------------
 	clearTestData();
 
 	{
-	  var _middleware6 = (0, _index.save)({ states: ['reducerMultipleLevels.setting1'], namespace: NAMESPACE_TEST });
+
+	  var states = ['reducerMultipleLevels.setting1', 'reducerMultipleLevels.setting3.level1.level2'];
+
+	  var _middleware6 = (0, _index.save)({ states: states, namespace: NAMESPACE_TEST });
 
 	  // Store which saves to LocalStorage
 	  var _storeA9 = (0, _redux.applyMiddleware)(_middleware6)(_redux.createStore)((0, _redux.combineReducers)({ reducerMultipleLevels: reducerMultipleLevels }), initialStateReducersPlusMultipleLevels);
 
-	  console.log('yo');
-
-	  _storeA9.dispatch({ type: MODIFY });
+	  _storeA9.dispatch({ type: NOOP });
 
 	  // Store which loads from LocalStorage
-	  var _storeB9 = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerMultipleLevels: reducerMultipleLevels }), (0, _index.load)({ states: ['reducerMultipleLevels.setting1'], namespace: NAMESPACE_TEST }));
+	  var _storeB9 = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerMultipleLevels: reducerMultipleLevels }), (0, _index.load)({
+	    states: states,
+	    namespace: NAMESPACE_TEST,
+	    preloadedState: initialStateReducersPlusMultipleLevels
+	  }));
 
 	  var _testResult7 = (0, _deepEqual2.default)(_storeA9.getState(), _storeB9.getState());
-
-	  console.log('storeA.getState()', _storeA9.getState());
-	  console.log('storeB.getState()', _storeB9.getState());
 
 	  outputTestResult('test10', _testResult7);
 	}
@@ -467,9 +468,9 @@
 	  }
 	}
 
-/***/ }),
+/***/ },
 /* 2 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 
@@ -519,9 +520,9 @@
 	exports.compose = _compose2['default'];
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
-/***/ }),
+/***/ },
 /* 3 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	// shim for using process in browser
 	var process = module.exports = {};
@@ -709,9 +710,9 @@
 	process.umask = function() { return 0; };
 
 
-/***/ }),
+/***/ },
 /* 4 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -975,9 +976,9 @@
 	  }, _ref2[_symbolObservable2['default']] = observable, _ref2;
 	}
 
-/***/ }),
+/***/ },
 /* 5 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	var baseGetTag = __webpack_require__(6),
 	    getPrototype = __webpack_require__(12),
@@ -1043,9 +1044,9 @@
 	module.exports = isPlainObject;
 
 
-/***/ }),
+/***/ },
 /* 6 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	var Symbol = __webpack_require__(7),
 	    getRawTag = __webpack_require__(10),
@@ -1077,9 +1078,9 @@
 	module.exports = baseGetTag;
 
 
-/***/ }),
+/***/ },
 /* 7 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	var root = __webpack_require__(8);
 
@@ -1089,9 +1090,9 @@
 	module.exports = Symbol;
 
 
-/***/ }),
+/***/ },
 /* 8 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	var freeGlobal = __webpack_require__(9);
 
@@ -1104,9 +1105,9 @@
 	module.exports = root;
 
 
-/***/ }),
+/***/ },
 /* 9 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/** Detect free variable `global` from Node.js. */
 	var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
@@ -1115,9 +1116,9 @@
 
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
-/***/ }),
+/***/ },
 /* 10 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	var Symbol = __webpack_require__(7);
 
@@ -1167,9 +1168,9 @@
 	module.exports = getRawTag;
 
 
-/***/ }),
+/***/ },
 /* 11 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
@@ -1195,9 +1196,9 @@
 	module.exports = objectToString;
 
 
-/***/ }),
+/***/ },
 /* 12 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	var overArg = __webpack_require__(13);
 
@@ -1207,9 +1208,9 @@
 	module.exports = getPrototype;
 
 
-/***/ }),
+/***/ },
 /* 13 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	/**
 	 * Creates a unary function that invokes `func` with its argument transformed.
@@ -1228,9 +1229,9 @@
 	module.exports = overArg;
 
 
-/***/ }),
+/***/ },
 /* 14 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	/**
 	 * Checks if `value` is object-like. A value is object-like if it's not `null`
@@ -1263,16 +1264,16 @@
 	module.exports = isObjectLike;
 
 
-/***/ }),
+/***/ },
 /* 15 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(16);
 
 
-/***/ }),
+/***/ },
 /* 16 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, module) {'use strict';
 
@@ -1305,9 +1306,9 @@
 	exports['default'] = result;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(17)(module)))
 
-/***/ }),
+/***/ },
 /* 17 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	module.exports = function(module) {
 		if(!module.webpackPolyfill) {
@@ -1321,9 +1322,9 @@
 	}
 
 
-/***/ }),
+/***/ },
 /* 18 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -1349,9 +1350,9 @@
 		return result;
 	};
 
-/***/ }),
+/***/ },
 /* 19 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 
@@ -1497,9 +1498,9 @@
 	}
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
-/***/ }),
+/***/ },
 /* 20 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -1527,9 +1528,9 @@
 	  /* eslint-enable no-empty */
 	}
 
-/***/ }),
+/***/ },
 /* 21 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -1583,9 +1584,9 @@
 	  return boundActionCreators;
 	}
 
-/***/ }),
+/***/ },
 /* 22 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -1646,9 +1647,9 @@
 	  };
 	}
 
-/***/ }),
+/***/ },
 /* 23 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	"use strict";
 
@@ -1689,9 +1690,9 @@
 	  };
 	}
 
-/***/ }),
+/***/ },
 /* 24 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 *  Copyright (c) 2014-2015, Facebook, Inc.
@@ -6673,9 +6674,9 @@
 
 	}));
 
-/***/ }),
+/***/ },
 /* 25 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -6708,6 +6709,29 @@
 	var debounceTimeout = null;
 
 	// ---------------------------------------------------
+	/* lensPath
+
+	  DESCRIPTION
+	  ----------
+	  Gets inner data from an object based on a specified path
+
+	  PARAMETERS
+	  ----------
+	  @path (Array of Strings) - Path used to get an object's inner data
+	                              e.g. ['prop', 'innerProp']
+	  @obj (Object) - Object to get inner data from
+
+	  USAGE EXAMPLE
+	  -------------
+	  lensPath(
+	    ['prop', 'innerProp'],
+	    { prop: { innerProp: 123 } }
+	  )
+
+	    returns
+
+	  123
+	*/
 
 	function lensPath(path, obj) {
 	  if (path.length === 1) {
@@ -6718,18 +6742,45 @@
 	}
 
 	// ---------------------------------------------------
+	/* realiseObject
 
-	function realiseObject(path) {
-	  var objectInitial = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	  DESCRIPTION
+	  ----------
+	  Create an object from a specified path, with
+	  the innermost property set with an initial value
 
-	  function realiseObject_(pathArr, objectInProgress) {
-	    if (pathArr.length === 0) {
+	  PARAMETERS
+	  ----------
+	  @objectPath (String) - Object path e.g. 'myObj.prop1.prop2'
+	  @objectInitialValue (Any, optional) - Value of the innermost property once object is created
+
+	  USAGE EXAMPLE
+	  -------------
+
+	  realiseObject('myObj.prop1.prop2', 123)
+
+	    returns
+
+	  {
+	    myObj: {
+	      prop1: {
+	          prop2: 123
+	        }
+	      }
+	  }
+	*/
+
+	function realiseObject(objectPath) {
+	  var objectInitialValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+	  function realiseObject_(objectPathArr, objectInProgress) {
+	    if (objectPathArr.length === 0) {
 	      return objectInProgress;
 	    } else {
-	      return realiseObject_(pathArr.slice(1), _defineProperty({}, pathArr[0], objectInProgress));
+	      return realiseObject_(objectPathArr.slice(1), _defineProperty({}, objectPathArr[0], objectInProgress));
 	    }
 	  }
-	  return realiseObject_(path.split('.').reverse(), objectInitial);
+	  return realiseObject_(objectPath.split('.').reverse(), objectInitialValue);
 	}
 
 	// ---------------------------------------------------
@@ -6750,7 +6801,8 @@
 	                                            Use this as a performance optimization if you feel you are saving
 	                                            to LocalStorage too often. Recommended value: 500 - 1000 milliseconds
 
-	  Usage examples:
+	  USAGE EXAMPLES
+	  -------------
 
 	    // save entire state tree - EASIEST OPTION
 	    save()
@@ -6826,6 +6878,7 @@
 	          _save(states, namespace);
 	        }
 
+	        // Digs into rootState for the data to put in LocalStorage
 	        function getStateForLocalStorage(state, rootState) {
 	          var delimiter = '.';
 
@@ -6898,7 +6951,9 @@
 	      _ref2$immutablejs = _ref2.immutablejs,
 	      immutablejs = _ref2$immutablejs === undefined ? IMMUTABLEJS_DEFAULT : _ref2$immutablejs,
 	      _ref2$namespace = _ref2.namespace,
-	      namespace = _ref2$namespace === undefined ? NAMESPACE_DEFAULT : _ref2$namespace;
+	      namespace = _ref2$namespace === undefined ? NAMESPACE_DEFAULT : _ref2$namespace,
+	      _ref2$preloadedState = _ref2.preloadedState,
+	      preloadedState = _ref2$preloadedState === undefined ? {} : _ref2$preloadedState;
 
 	  // Validate 'states' parameter
 	  if (!isArray(states)) {
@@ -6918,8 +6973,9 @@
 	    namespace = NAMESPACE_DEFAULT;
 	  }
 
-	  var loadedState = {};
+	  var loadedState = preloadedState;
 
+	  // Load all of the namespaced Redux data from LocalStorage into local Redux state tree
 	  if (states.length === 0) {
 	    if (localStorage[namespace]) {
 	      loadedState = JSON.parse(localStorage[namespace]);
@@ -6929,6 +6985,7 @@
 	      }
 	    }
 	  } else {
+	    // Load only specified states into the local Redux state tree
 	    states.forEach(function (state) {
 	      if (localStorage[namespace + '_' + state]) {
 	        loadedState = (0, _objectMerge2.default)(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + '_' + state])));
@@ -7055,9 +7112,9 @@
 	  return value !== null && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object';
 	}
 
-/***/ }),
+/***/ },
 /* 26 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/*
 	License gpl-3.0 http://www.gnu.org/licenses/gpl-3.0-standalone.html
@@ -7280,9 +7337,9 @@
 	objectMerge.createOptions = createOptions;
 	module.exports = objectMerge;
 
-/***/ }),
+/***/ },
 /* 27 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	/**
 	 * Executes a function on each of an objects own enumerable properties. The
@@ -7303,9 +7360,9 @@
 	};
 	module.exports = objectForeach;
 
-/***/ }),
+/***/ },
 /* 28 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	/*
 	License gpl-3.0 http://www.gnu.org/licenses/gpl-3.0-standalone.html
@@ -7338,9 +7395,9 @@
 	}
 	module.exports = cloneFunction;
 
-/***/ }),
+/***/ },
 /* 29 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	var pSlice = Array.prototype.slice;
 	var objectKeys = __webpack_require__(30);
@@ -7438,9 +7495,9 @@
 	}
 
 
-/***/ }),
+/***/ },
 /* 30 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	exports = module.exports = typeof Object.keys === 'function'
 	  ? Object.keys : shim;
@@ -7453,9 +7510,9 @@
 	}
 
 
-/***/ }),
+/***/ },
 /* 31 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	var supportsArgumentsClass = (function(){
 	  return Object.prototype.toString.call(arguments)
@@ -7479,5 +7536,5 @@
 	};
 
 
-/***/ })
+/***/ }
 /******/ ]);

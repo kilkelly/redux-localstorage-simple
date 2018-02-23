@@ -11,6 +11,29 @@ const IMMUTABLEJS_DEFAULT = false
 let debounceTimeout = null
 
 // ---------------------------------------------------
+/* lensPath
+
+  DESCRIPTION
+  ----------
+  Gets inner data from an object based on a specified path
+
+  PARAMETERS
+  ----------
+  @path (Array of Strings) - Path used to get an object's inner data
+                              e.g. ['prop', 'innerProp']
+  @obj (Object) - Object to get inner data from
+
+  USAGE EXAMPLE
+  -------------
+  lensPath(
+    ['prop', 'innerProp'],
+    { prop: { innerProp: 123 } }
+  )
+
+    returns
+
+  123
+*/
 
 function lensPath (path, obj) {
   if (path.length === 1) {
@@ -21,16 +44,43 @@ function lensPath (path, obj) {
 }
 
 // ---------------------------------------------------
+/* realiseObject
 
-function realiseObject(path, objectInitial = {}) {
-  function realiseObject_(pathArr, objectInProgress) {
-      if (pathArr.length === 0) {
-        return objectInProgress
-      } else {
-        return realiseObject_(pathArr.slice(1), {[pathArr[0]]: objectInProgress})
+  DESCRIPTION
+  ----------
+  Create an object from a specified path, with
+  the innermost property set with an initial value
+
+  PARAMETERS
+  ----------
+  @objectPath (String) - Object path e.g. 'myObj.prop1.prop2'
+  @objectInitialValue (Any, optional) - Value of the innermost property once object is created
+
+  USAGE EXAMPLE
+  -------------
+
+  realiseObject('myObj.prop1.prop2', 123)
+
+    returns
+
+  {
+    myObj: {
+      prop1: {
+          prop2: 123
+        }
       }
   }
-  return realiseObject_(path.split('.').reverse(), objectInitial)
+*/
+
+function realiseObject (objectPath, objectInitialValue = {}) {
+  function realiseObject_ (objectPathArr, objectInProgress) {
+    if (objectPathArr.length === 0) {
+      return objectInProgress
+    } else {
+      return realiseObject_(objectPathArr.slice(1), {[objectPathArr[0]]: objectInProgress})
+    }
+  }
+  return realiseObject_(objectPath.split('.').reverse(), objectInitialValue)
 }
 
 // ---------------------------------------------------
@@ -51,7 +101,8 @@ function realiseObject(path, objectInitial = {}) {
                                             Use this as a performance optimization if you feel you are saving
                                             to LocalStorage too often. Recommended value: 500 - 1000 milliseconds
 
-  Usage examples:
+  USAGE EXAMPLES
+  -------------
 
     // save entire state tree - EASIEST OPTION
     save()
@@ -121,6 +172,7 @@ export function save ({
       _save(states, namespace)
     }
 
+    // Digs into rootState for the data to put in LocalStorage
     function getStateForLocalStorage (state, rootState) {
       const delimiter = '.'
 
@@ -136,7 +188,7 @@ export function save ({
       if (states.length === 0) {
         localStorage[namespace] = JSON.stringify(store.getState())
       } else {
-        states.forEach(state => {
+        states.forEach(state => {          
           localStorage[namespace + '_' + state] = JSON.stringify(getStateForLocalStorage(state, store.getState()))
         })
       }
@@ -187,7 +239,8 @@ export function save ({
 export function load ({
       states = STATES_DEFAULT,
       immutablejs = IMMUTABLEJS_DEFAULT,
-      namespace = NAMESPACE_DEFAULT
+      namespace = NAMESPACE_DEFAULT,
+      preloadedState = {}
     } = {}) {
   // Validate 'states' parameter
   if (!isArray(states)) {
@@ -207,8 +260,9 @@ export function load ({
     namespace = NAMESPACE_DEFAULT
   }
 
-  let loadedState = {}
+  let loadedState = preloadedState
 
+  // Load all of the namespaced Redux data from LocalStorage into local Redux state tree
   if (states.length === 0) {
     if (localStorage[namespace]) {
       loadedState = JSON.parse(localStorage[namespace])
@@ -217,8 +271,8 @@ export function load ({
         loadedState = fromJS(loadedState)
       }
     }
-  } else {
-    states.forEach(function (state) {
+  } else { // Load only specified states into the local Redux state tree
+    states.forEach(function (state) {      
       if (localStorage[namespace + '_' + state]) {
         loadedState = objectMerge(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + '_' + state])))
       } else {
@@ -267,7 +321,7 @@ export function combineLoads (...loads) {
     if (!isObject(load)) {
       console.error(MODULE_NAME, 'One or more loads provided to \'combineLoads()\' is not a valid object. Ignoring the invalid load/s. Check your \'combineLoads()\' method.')
       load = {}
-    }    
+    }
 
     for (let state in load) {
       combinedLoad[state] = load[state]

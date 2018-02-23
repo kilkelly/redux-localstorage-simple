@@ -29,6 +29,29 @@ var IMMUTABLEJS_DEFAULT = false;
 var debounceTimeout = null;
 
 // ---------------------------------------------------
+/* lensPath
+
+  DESCRIPTION
+  ----------
+  Gets inner data from an object based on a specified path
+
+  PARAMETERS
+  ----------
+  @path (Array of Strings) - Path used to get an object's inner data
+                              e.g. ['prop', 'innerProp']
+  @obj (Object) - Object to get inner data from
+
+  USAGE EXAMPLE
+  -------------
+  lensPath(
+    ['prop', 'innerProp'],
+    { prop: { innerProp: 123 } }
+  )
+
+    returns
+
+  123
+*/
 
 function lensPath(path, obj) {
   if (path.length === 1) {
@@ -39,18 +62,45 @@ function lensPath(path, obj) {
 }
 
 // ---------------------------------------------------
+/* realiseObject
 
-function realiseObject(path) {
-  var objectInitial = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  DESCRIPTION
+  ----------
+  Create an object from a specified path, with
+  the innermost property set with an initial value
 
-  function realiseObject_(pathArr, objectInProgress) {
-    if (pathArr.length === 0) {
+  PARAMETERS
+  ----------
+  @objectPath (String) - Object path e.g. 'myObj.prop1.prop2'
+  @objectInitialValue (Any, optional) - Value of the innermost property once object is created
+
+  USAGE EXAMPLE
+  -------------
+
+  realiseObject('myObj.prop1.prop2', 123)
+
+    returns
+
+  {
+    myObj: {
+      prop1: {
+          prop2: 123
+        }
+      }
+  }
+*/
+
+function realiseObject(objectPath) {
+  var objectInitialValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  function realiseObject_(objectPathArr, objectInProgress) {
+    if (objectPathArr.length === 0) {
       return objectInProgress;
     } else {
-      return realiseObject_(pathArr.slice(1), _defineProperty({}, pathArr[0], objectInProgress));
+      return realiseObject_(objectPathArr.slice(1), _defineProperty({}, objectPathArr[0], objectInProgress));
     }
   }
-  return realiseObject_(path.split('.').reverse(), objectInitial);
+  return realiseObject_(objectPath.split('.').reverse(), objectInitialValue);
 }
 
 // ---------------------------------------------------
@@ -71,7 +121,8 @@ function realiseObject(path) {
                                             Use this as a performance optimization if you feel you are saving
                                             to LocalStorage too often. Recommended value: 500 - 1000 milliseconds
 
-  Usage examples:
+  USAGE EXAMPLES
+  -------------
 
     // save entire state tree - EASIEST OPTION
     save()
@@ -147,6 +198,7 @@ function save() {
           _save(states, namespace);
         }
 
+        // Digs into rootState for the data to put in LocalStorage
         function getStateForLocalStorage(state, rootState) {
           var delimiter = '.';
 
@@ -219,7 +271,9 @@ function load() {
       _ref2$immutablejs = _ref2.immutablejs,
       immutablejs = _ref2$immutablejs === undefined ? IMMUTABLEJS_DEFAULT : _ref2$immutablejs,
       _ref2$namespace = _ref2.namespace,
-      namespace = _ref2$namespace === undefined ? NAMESPACE_DEFAULT : _ref2$namespace;
+      namespace = _ref2$namespace === undefined ? NAMESPACE_DEFAULT : _ref2$namespace,
+      _ref2$preloadedState = _ref2.preloadedState,
+      preloadedState = _ref2$preloadedState === undefined ? {} : _ref2$preloadedState;
 
   // Validate 'states' parameter
   if (!isArray(states)) {
@@ -239,8 +293,9 @@ function load() {
     namespace = NAMESPACE_DEFAULT;
   }
 
-  var loadedState = {};
+  var loadedState = preloadedState;
 
+  // Load all of the namespaced Redux data from LocalStorage into local Redux state tree
   if (states.length === 0) {
     if (localStorage[namespace]) {
       loadedState = JSON.parse(localStorage[namespace]);
@@ -250,6 +305,7 @@ function load() {
       }
     }
   } else {
+    // Load only specified states into the local Redux state tree
     states.forEach(function (state) {
       if (localStorage[namespace + '_' + state]) {
         loadedState = (0, _objectMerge2.default)(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + '_' + state])));
