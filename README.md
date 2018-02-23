@@ -114,14 +114,15 @@ The **load** method takes a optional configuration object as an argument. It has
 {
     [Array states],    
     [String namespace],
-    [Boolean immutablejs]
+    [Boolean immutablejs],
+    [Object preloadedState]
 }
 ```
 
 - states (Array, optional) - This is an optional array of strings specifying which parts of the Redux state tree you would like to load from LocalStorage. e.g. ["user", "products"]. These parts of the state tree must have been previously saved using the **save** method. Typically states have identical names to your Redux reducers. If you do not specify any states then your entire Redux state tree will be loaded from LocalStorage.
 - namespace (String, optional) - If you have saved your entire state tree or parts of your state tree with a namespace you will need to specify it in order to load it from LocalStorage.
 - immutablejs (Boolean, optional) - If the parts of the state tree you are loading use [Immutable.js](https://facebook.github.io/immutable-js/) data structures set this property to true or else they won't be handled correctly.
-
+- preloadedState (Object, optional) - Passthrough for the `preloadedState` argument in Redux's `createStore` method. See section **Advanced Usage** below.
 
 #### Examples
 
@@ -218,6 +219,54 @@ clear({
     namespace: "my_cool_app"
 })  
 ```
+
+## Advanced Usage
+
+In a more complex project you may find that you are saving unnecessary reducer data to LocalStorage and would appreciate a more granular approach. Thankfully there is a way to do this. 
+
+First let's look at a normal example. Let's say you have a reducer called `settings` and its state tree looks like this:
+
+```sh
+const settingsReducerInitialState = {
+    theme: 'light'
+    itemsPerPage: 10
+}
+```
+
+Using `redux-localstorage-simple`'s `save()` method for the `settings` reducer would look like this:
+
+```sh
+save({ states: ["settings"] })
+```
+
+This saves all of the `settings` reducer's properties to LocalStorage. But wait, what if we really only care about saving the user's choice of `theme` and not `itemsPerPage`. Here's how to fix this:
+
+```sh
+save({ states: ["settings.theme"] })
+```
+
+This saves only the `theme` setting to LocalStorage. However this presents an additional problem, if `itemsPerPage` is not saved won't my app crash when it can't find it upon loading from LocalStorage?
+
+Yes in most cases it would. So to prevent this you can use the `preloadedState` argument in the `load()` method to provide some initial data.
+
+```sh
+load({
+    states: ["settings.theme"],
+    preloadedState: {
+        itemsPerPage: 10        
+    }
+})
+```
+
+Also note in the above example that since `settings.theme` was specified in the `load()` method we must also mirror this exactly in the `save()` method. This goes for all states you specify using the granular approach.
+
+So if you have:
+
+`save({ states: ["settings.theme"] })`
+
+You must also have:
+
+`load({ states: ["settings.theme"] })`
 
 ## Testing
 
