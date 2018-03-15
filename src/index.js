@@ -1,7 +1,6 @@
 'use strict'
 
-import { fromJS } from 'immutable'
-import objectMerge from 'object-merge';
+import objectMerge from 'object-merge'
 
 const MODULE_NAME = '[Redux-LocalStorage-Simple]'
 const NAMESPACE_DEFAULT = 'redux_localstorage_simple'
@@ -205,7 +204,6 @@ export function save ({
             Properties:
               states (Array of Strings, optional) - Parts of state tree to load e.g. ['user', 'products']
               namespace (String, optional) - Namespace required to retrieve your LocalStorage items, if any
-              immutablejs (Boolean, optional) - If dealing with Immutable.js data structures, set this to true to load them correctly
 
   Usage examples:
 
@@ -220,12 +218,6 @@ export function save ({
     // load the entire state tree which was previously saved with the namespace "my_cool_app"
     load({
       namespace: 'my_cool_app'
-    })
-
-    // load specific parts of the state tree which use Immutable.js data structures
-    load({
-        states: ['user', 'products'],
-        immutablejs: true
     })
 
     // load specific parts of the state tree which was previously saved with the namespace "my_cool_app"
@@ -248,16 +240,15 @@ export function load ({
     states = STATES_DEFAULT
   }
 
-  // Validate 'immutablejs' parameter
-  if (!isBoolean(immutablejs)) {
-    console.error(MODULE_NAME, '\'immutablejs\' parameter in \'load()\' method was passed a non-boolean value. Setting default value instead. Check your \'load()\' method.')
-    immutablejs = IMMUTABLEJS_DEFAULT
-  }
-
   // Validate 'namespace' parameter
   if (!isString(namespace)) {
     console.error(MODULE_NAME, '\'namespace\' parameter in \'load()\' method was passed a non-string value. Setting default value instead. Check your \'load()\' method.')
     namespace = NAMESPACE_DEFAULT
+  }
+
+  // Display immmutablejs deprecation notice if developer tries to utilise it
+  if (immutablejs === true) {
+    console.error(MODULE_NAME, 'Support for Immutable.js data structures has been deprecated as of version 2.0.0. Please use version 1.4.0 if you require this functionality.')
   }
 
   let loadedState = preloadedState
@@ -266,10 +257,6 @@ export function load ({
   if (states.length === 0) {
     if (localStorage[namespace]) {
       loadedState = JSON.parse(localStorage[namespace])
-
-      if (immutablejs) {
-        loadedState = fromJS(loadedState)
-      }
     }
   } else { // Load only specified states into the local Redux state tree
     states.forEach(function (state) {      
@@ -279,12 +266,6 @@ export function load ({
         console.error(MODULE_NAME, "Invalid load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'")
       }
     })
-
-    if (immutablejs) {
-      for (let key in loadedState) {
-        loadedState[key] = fromJS(loadedState[key])
-      }
-    }
   }
 
   return loadedState
@@ -292,19 +273,13 @@ export function load ({
 
 /**
   Combines multiple 'load' method calls to return a single state for use in Redux's createStore method.
-  Use this when parts of the loading process need to be handled differently e.g. some parts of your state tree are immutable and some are not
+  Use this when parts of the loading process need to be handled differently e.g. some parts of your state tree use different namespaces
 
   PARAMETERS
   ----------
   @loads - 'load' method calls passed into this method as normal arguments
 
   Usage example:
-
-    // load both vanilla JavaScript and Immutable.js parts of the state tree from LocalStorage
-    combineLoads(
-      load({ states: ['user'] }), // loading normal object
-      load({ states: ['products'], immutablejs: true ) // this part of the state tree is an Immutable.js structure
-    )
 
     // Load parts of the state tree saved with different namespaces
     combineLoads(
@@ -382,10 +357,6 @@ function isInteger (value) {
   return typeof value === 'number' &&
     isFinite(value) &&
     Math.floor(value) === value
-}
-
-function isBoolean (value) {
-  return typeof value === 'boolean'
 }
 
 function isObject (value) {
