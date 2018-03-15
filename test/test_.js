@@ -1,7 +1,6 @@
 'use strict'
 
 import { createStore, applyMiddleware, combineReducers } from 'redux'
-import { fromJS, is } from 'immutable'
 import { save, load, combineLoads, clear } from '../src/index' // redux-localstorage-simple dist
 import equal from 'deep-equal'
 
@@ -37,16 +36,7 @@ var initialStateReducerMultipleLevels = {
   }
 }
 
-var initialStateReducerImmutable = fromJS({
-  z: 5
-})
-
 var initialStateReducers = {
-  reducerA: initialStateReducerA,
-  reducerB: initialStateReducerB
-}
-
-var initialStateReducersPlusImmutable = {
   reducerA: initialStateReducerA,
   reducerB: initialStateReducerB
 }
@@ -76,15 +66,6 @@ var reducerB = function (state = initialStateReducerB, action) {
       return {
         y: state.y + 1
       }
-    default:
-      return state
-  }
-}
-
-var reducerImmutable = function (state = initialStateReducerImmutable, action) {
-  switch (action.type) {
-    case MULTIPLY:
-      return state.set('z', state.get('z') * 2)
     default:
       return state
   }
@@ -246,73 +227,7 @@ clearTestData()
 }
 
 // -------------------------------------------------------------------------------
-// TEST 5 - Save and load Redux state tree containing an Immutable.js data structure
-// -------------------------------------------------------------------------------
-clearTestData()
-
-{
-  let middleware = save()
-
-  // Store which saves to LocalStorage
-  let storeA = applyMiddleware(middleware)(createStore)(
-    reducerImmutable,
-    initialStateReducerImmutable
-  )
-
-  // Trigger a save to LocalStorage using a multiply action
-  storeA.dispatch({ type: MULTIPLY })
-
-  // Store which loads from LocalStorage
-  let storeB = createStore(
-    reducerImmutable,
-    load({ immutablejs: true })
-  )
-
-  // Using Immutable.js 'is' function to perform equality check
-  let testResult = is(
-    storeA.getState(),
-    storeB.getState()
-  )
-
-  outputTestResult('test5', testResult)
-}
-
-// -------------------------------------------------------------------------------
-// TEST 6 - Save and load entire Redux state tree containing both normal JavaScript objects
-// and Immutable.js data structures
-// -------------------------------------------------------------------------------
-clearTestData()
-
-{
-  let middleware = save({ states: ['reducerA', 'reducerB', 'reducerImmutable'] })
-
-  // Store which saves to LocalStorage
-  let storeA = applyMiddleware(middleware)(createStore)(
-    combineReducers({ reducerA, reducerB, reducerImmutable }),
-    initialStateReducersPlusImmutable
-  )
-
-  // Trigger a save to LocalStorage using a noop action
-  storeA.dispatch({ type: NOOP })
-
-  // Store which loads from LocalStorage
-  let storeB = createStore(
-    combineReducers({ reducerA, reducerB, reducerImmutable }),
-    combineLoads(
-        load({ states: ['reducerA', 'reducerB'] }),
-        load({ states: ['reducerImmutable'], immutablejs: true })
-    )
-  )
-
-  let testResult = equal(storeA.getState()['reducerA'], storeB.getState()['reducerA']) &&
-            equal(storeA.getState()['reducerB'], storeB.getState()['reducerB']) &&
-            is(storeA.getState()['reducerImmutable'], storeB.getState()['reducerImmutable'])
-
-  outputTestResult('test6', testResult)
-}
-
-// -------------------------------------------------------------------------------
-// TEST 7 - Clear Redux state tree data saved without a specific namespace
+// TEST 5 - Clear Redux state tree data saved without a specific namespace
 // -------------------------------------------------------------------------------
 clearTestData()
 
@@ -341,7 +256,7 @@ clearTestData()
 }
 
 // -------------------------------------------------------------------------------
-// TEST 8 - Clear Redux state tree data saved with a specific namespace
+// TEST 6 - Clear Redux state tree data saved with a specific namespace
 // -------------------------------------------------------------------------------
 clearTestData()
 
@@ -370,7 +285,7 @@ clearTestData()
 }
 
 // -------------------------------------------------------------------------------
-// TEST 9 - Save Redux state with debouncing
+// TEST 7 - Save Redux state with debouncing
 // -------------------------------------------------------------------------------
 
 clearTestData()
@@ -405,7 +320,7 @@ clearTestData()
 }
 
 // -------------------------------------------------------------------------------
-// TEST 10 - Save and load specific properties of a <u>part</u> of Redux state tree under a specified <u>namespace</u>
+// TEST 8 - Save and load specific properties of a <u>part</u> of Redux state tree under a specified <u>namespace</u>
 // -------------------------------------------------------------------------------
 clearTestData()
 
