@@ -7,6 +7,12 @@ declare module 'redux-localstorage-simple' {
     namespace?: string;
     debounce?: number;
   }
+  interface LoadOptions {
+    states?: string[];
+    namespace?: string;
+    immutablejs?: boolean;
+    preloadedState?: {};
+  }
   export function save(options?:RLSOptions):Middleware
-  export function load():object
+  export function load(options?:LoadOptions):object
 }
