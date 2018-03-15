@@ -1,6 +1,6 @@
 # Redux-LocalStorage-Simple
 
-Save and load Redux state to and from LocalStorage. Supports Immutable.js data structures.
+Save and load Redux state to and from LocalStorage.
 
 ## Installation
 ```sh
@@ -40,7 +40,7 @@ const store = createStoreWithMiddleware(
 
 ### save([Object config])
 
-Saving to LocalStorage is achieved using [Redux middleware](http://redux.js.org/docs/advanced/Middleware.html) and saves each time an action is handled by your reducer. You will need to pass the **save** method into Redux's **applyMiddleware** method, like so...
+Saving to LocalStorage is achieved using [Redux middleware](http://redux.js.org/docs/advanced/Middleware.html) and saves each time an action is handled by your reducer. You will need to pass the `save` method into Redux's `applyMiddleware` method, like so...
 
 ```sh
 applyMiddleware(save())
@@ -49,7 +49,7 @@ applyMiddleware(save())
 See the Usage Example above to get a better idea of how this works.
 
 #### Arguments
-The **save** method takes a optional configuration object as an argument. It has the following properties:
+The `save` method takes a optional configuration object as an argument. It has the following properties:
 
 ```sh
 {
@@ -108,20 +108,18 @@ createStore(reducer, load())
 See the Usage Example above to get a better idea of how this works.
 
 #### Arguments
-The **load** method takes a optional configuration object as an argument. It has the following properties:
+The `load` method takes a optional configuration object as an argument. It has the following properties:
 
 ```sh
 {
     [Array states],    
     [String namespace],
-    [Boolean immutablejs],
     [Object preloadedState]
 }
 ```
 
-- states (Array, optional) - This is an optional array of strings specifying which parts of the Redux state tree you would like to load from LocalStorage. e.g. ["user", "products"]. These parts of the state tree must have been previously saved using the **save** method. Typically states have identical names to your Redux reducers. If you do not specify any states then your entire Redux state tree will be loaded from LocalStorage.
+- states (Array, optional) - This is an optional array of strings specifying which parts of the Redux state tree you would like to load from LocalStorage. e.g. ["user", "products"]. These parts of the state tree must have been previously saved using the `save` method. Typically states have identical names to your Redux reducers. If you do not specify any states then your entire Redux state tree will be loaded from LocalStorage.
 - namespace (String, optional) - If you have saved your entire state tree or parts of your state tree with a namespace you will need to specify it in order to load it from LocalStorage.
-- immutablejs (Boolean, optional) - If the parts of the state tree you are loading use [Immutable.js](https://facebook.github.io/immutable-js/) data structures set this property to true or else they won't be handled correctly.
 - preloadedState (Object, optional) - Passthrough for the `preloadedState` argument in Redux's `createStore` method. See section **Advanced Usage** below.
 
 #### Examples
@@ -144,15 +142,6 @@ Load the entire state tree which was previously saved with the namespace "my_coo
 load({ namespace: "my_cool_app" })
 ```
 
-Load specific parts of the state tree which use Immutable.js data structures.
-
-```sh
-load({ 
-    states: ["user", "products"],
-    immutablejs: true
-})
-```
-
 Load specific parts of the state tree which was previously saved with the namespace "my_cool_app".
 
 ```sh
@@ -163,23 +152,23 @@ load({
 ```
 
 ### combineLoads(...loads)
-If your state tree is a mixture of vanilla JavaScript objects and Immutable.js data structures, or if you have used various different namespaces you can use **combineLoads** for a more intricate loading process.
+If you provided more than one call to `save` in your Redux middleware you will need to use `combineLoads` for a more intricate loading process.
 
 #### Arguments
-- loads - This method takes any number of **load** methods as arguments, with each load handling a different part of the state tree. This is best described by viewing the following examples...
+- loads - This method takes any number of `load` methods as arguments, with each load handling a different part of the state tree. In practice you will provide one `load` method to handle each `save` method provided in your Redux middleware.
 
-#### Examples
+#### Example
 
-Load both vanilla JavaScript and Immutable.js parts of the state tree.
+Load parts of the state tree saved with different namespaces. Here are the `save` methods in your Redux middleware:
 
 ```sh
-combineLoads( 
-    load({ states: ["user", "categories"] }),
-    load({ states: ["products"], immutablejs: true })
-)   
+applyMiddleware(
+    save({ states: ["user"], namespace: "account_stuff" }),
+    load({ states: ["products", "categories"], namespace: "site_stuff" )
+)
 ```
 
-Load parts of the state tree saved with different namespaces.
+The corresponding use of `combineLoads` looks like this:
 
 ```sh
 combineLoads( 
@@ -194,7 +183,7 @@ Clears all Redux state tree data from LocalStorage. Note: only clears data which
 
 #### Arguments
 
-The **clear** method takes a optional configuration object as an argument. It has the following properties:
+The `clear` method takes a optional configuration object as an argument. It has the following properties:
 
 ```sh
 {
@@ -271,6 +260,12 @@ You must also have:
 ## Testing
 
 To run tests for this package open the file 'test/test.html' in your browser. Because this package uses LocalStorage we therefore need to test it in an environment which supports it i.e. modern browsers.
+
+## Removal of support for Immutable.js data structures
+
+Support for Immutable.js data structures has been removed as of version 1.4.0. If you require this functionality please install version 1.4.0 using the following command:
+
+`npm install --save redux-localstorage-simple@1.4.0`
 
 ## Feedback
 
