@@ -1,7 +1,7 @@
 {
   "name": "redux-localstorage-simple",
   "version": "2.0.0",
-  "description": "Save and load Redux state to and from LocalStorage. Supports Immutable.js data structures.",
+  "description": "Save and load Redux state to and from LocalStorage.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
