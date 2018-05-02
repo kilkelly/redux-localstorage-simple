@@ -1651,6 +1651,7 @@
 	var STATES_DEFAULT = [];
 	var DEBOUNCE_DEFAULT = 0;
 	var IMMUTABLEJS_DEFAULT = false;
+	var DISABLE_LOAD_WARNINGS_DEFAULT = false;
 	var debounceTimeout = null;
 
 	// ---------------------------------------------------
@@ -1890,6 +1891,8 @@
 	      immutablejs = _ref2$immutablejs === undefined ? IMMUTABLEJS_DEFAULT : _ref2$immutablejs,
 	      _ref2$namespace = _ref2.namespace,
 	      namespace = _ref2$namespace === undefined ? NAMESPACE_DEFAULT : _ref2$namespace,
+	      _ref2$disableInvalidL = _ref2.disableInvalidLoadWarnings,
+	      disableInvalidLoadWarnings = _ref2$disableInvalidL === undefined ? DISABLE_LOAD_WARNINGS_DEFAULT : _ref2$disableInvalidL,
 	      _ref2$preloadedState = _ref2.preloadedState,
 	      preloadedState = _ref2$preloadedState === undefined ? {} : _ref2$preloadedState;
 
@@ -1922,8 +1925,8 @@
 	    states.forEach(function (state) {
 	      if (localStorage[namespace + '_' + state]) {
 	        loadedState = (0, _objectMerge2.default)(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + '_' + state])));
-	      } else {
-	        console.error(MODULE_NAME, "Invalid load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'");
+	      } else if (!disableInvalidLoadWarnings) {
+	        console.warn(MODULE_NAME, "Empty load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'");
 	      }
 	    });
 	  }

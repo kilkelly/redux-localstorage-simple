@@ -7,6 +7,7 @@ const NAMESPACE_DEFAULT = 'redux_localstorage_simple'
 const STATES_DEFAULT = []
 const DEBOUNCE_DEFAULT = 0
 const IMMUTABLEJS_DEFAULT = false
+const DISABLE_LOAD_WARNINGS_DEFAULT = false;
 let debounceTimeout = null
 
 // ---------------------------------------------------
@@ -232,6 +233,7 @@ export function load ({
       states = STATES_DEFAULT,
       immutablejs = IMMUTABLEJS_DEFAULT,
       namespace = NAMESPACE_DEFAULT,
+      disableInvalidLoadWarnings = DISABLE_LOAD_WARNINGS_DEFAULT,
       preloadedState = {}
     } = {}) {
   // Validate 'states' parameter
@@ -262,8 +264,8 @@ export function load ({
     states.forEach(function (state) {      
       if (localStorage[namespace + '_' + state]) {
         loadedState = objectMerge(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + '_' + state])))
-      } else {
-        console.error(MODULE_NAME, "Invalid load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'")
+      } else if(!disableInvalidLoadWarnings) {
+        console.warn(MODULE_NAME, "Empty load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'")
       }
     })
   }
