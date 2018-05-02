@@ -262,8 +262,6 @@ export function load ({
     states.forEach(function (state) {      
       if (localStorage[namespace + '_' + state]) {
         loadedState = objectMerge(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + '_' + state])))
-      } else {
-        console.error(MODULE_NAME, "Invalid load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'")
       }
     })
   }
