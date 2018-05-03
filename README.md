@@ -114,7 +114,8 @@ The `load` method takes a optional configuration object as an argument. It has t
 {
     [Array states],    
     [String namespace],
-    [Object preloadedState]
+    [Object preloadedState],
+    [Boolean disableWarnings]
 }
 ```
 
