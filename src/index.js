@@ -7,7 +7,30 @@ const NAMESPACE_DEFAULT = 'redux_localstorage_simple'
 const STATES_DEFAULT = []
 const DEBOUNCE_DEFAULT = 0
 const IMMUTABLEJS_DEFAULT = false
+const DISABLE_WARNINGS_DEFAULT = false
 let debounceTimeout = null
+
+// ---------------------------------------------------
+/* warn
+
+  DESCRIPTION
+  ----------
+  Write a warning to the console if warnings are enabled
+
+  PARAMETERS
+  ----------
+  @disableWarnings (Boolean) - If set to true then the warning is not written to the console
+  @warningMessage (String) - The message to write to the console
+
+*/
+
+function warn (disableWarnings) {
+  return function (warningMessage) {
+    if (!disableWarnings) {
+      console.warn(MODULE_NAME, warningMessage)
+    }
+  }
+}
 
 // ---------------------------------------------------
 /* lensPath
@@ -139,19 +162,19 @@ export function save ({
 
     // Validate 'states' parameter
     if (!isArray(states)) {
-      console.error(MODULE_NAME, '\'states\' parameter in \'save()\' method was passed a non-array value. Setting default value instead. Check your \'save()\' method.')
+      console.error(MODULE_NAME, "'states' parameter in 'save()' method was passed a non-array value. Setting default value instead. Check your 'save()' method.")
       states = STATES_DEFAULT
     }
 
     // Validate 'namespace' parameter
     if (!isString(namespace)) {
-      console.error(MODULE_NAME, '\'namespace\' parameter in \'save()\' method was passed a non-string value. Setting default value instead. Check your \'save()\' method.')
+      console.error(MODULE_NAME, "'namespace' parameter in 'save()' method was passed a non-string value. Setting default value instead. Check your 'save()' method.")
       namespace = NAMESPACE_DEFAULT
     }
 
     // Validate 'debounce' parameter
     if (!isInteger(debounce)) {
-      console.error(MODULE_NAME, '\'debounce\' parameter in \'save()\' method was passed a non-integer value. Setting default value instead. Check your \'save()\' method.')
+      console.error(MODULE_NAME, "'debounce' parameter in 'save()' method was passed a non-integer value. Setting default value instead. Check your 'save()' method.")
       debounce = DEBOUNCE_DEFAULT
     }
 
@@ -232,23 +255,27 @@ export function load ({
       states = STATES_DEFAULT,
       immutablejs = IMMUTABLEJS_DEFAULT,
       namespace = NAMESPACE_DEFAULT,
-      preloadedState = {}
+      preloadedState = {},
+      disableWarnings = DISABLE_WARNINGS_DEFAULT
     } = {}) {
+  // Bake disableWarnings into the warn function
+  const warn_ = warn(disableWarnings)
+
   // Validate 'states' parameter
   if (!isArray(states)) {
-    console.error(MODULE_NAME, '\'states\' parameter in \'load()\' method was passed a non-array value. Setting default value instead. Check your \'load()\' method.')
+    console.error(MODULE_NAME, "'states' parameter in 'load()' method was passed a non-array value. Setting default value instead. Check your 'load()' method.")
     states = STATES_DEFAULT
   }
 
   // Validate 'namespace' parameter
   if (!isString(namespace)) {
-    console.error(MODULE_NAME, '\'namespace\' parameter in \'load()\' method was passed a non-string value. Setting default value instead. Check your \'load()\' method.')
+    console.error(MODULE_NAME, "'namespace' parameter in 'load()' method was passed a non-string value. Setting default value instead. Check your 'load()' method.")
     namespace = NAMESPACE_DEFAULT
   }
 
   // Display immmutablejs deprecation notice if developer tries to utilise it
   if (immutablejs === true) {
-    console.error(MODULE_NAME, 'Support for Immutable.js data structures has been deprecated as of version 2.0.0. Please use version 1.4.0 if you require this functionality.')
+    warn_('Support for Immutable.js data structures has been deprecated as of version 2.0.0. Please use version 1.4.0 if you require this functionality.')
   }
 
   let loadedState = preloadedState
@@ -263,7 +290,7 @@ export function load ({
       if (localStorage[namespace + '_' + state]) {
         loadedState = objectMerge(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + '_' + state])))
       } else {
-        console.error(MODULE_NAME, "Invalid load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'")
+        warn_("Invalid load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.")
       }
     })
   }
@@ -294,7 +321,7 @@ export function combineLoads (...loads) {
   loads.forEach(load => {
     // Make sure current 'load' is an object
     if (!isObject(load)) {
-      console.error(MODULE_NAME, 'One or more loads provided to \'combineLoads()\' is not a valid object. Ignoring the invalid load/s. Check your \'combineLoads()\' method.')
+      console.error(MODULE_NAME, "One or more loads provided to 'combineLoads()' is not a valid object. Ignoring the invalid load/s. Check your 'combineLoads()' method.")
       load = {}
     }
 
@@ -330,7 +357,7 @@ export function combineLoads (...loads) {
 export function clear ({ namespace = NAMESPACE_DEFAULT } = {}) {
   // Validate 'namespace' parameter
   if (!isString(namespace)) {
-    console.error(MODULE_NAME, '\'namespace\' parameter in \'clear()\' method was passed a non-string value. Setting default value instead. Check your \'clear()\' method.')
+    console.error(MODULE_NAME, "'namespace' parameter in 'clear()' method was passed a non-string value. Setting default value instead. Check your 'clear()' method.")
     namespace = NAMESPACE_DEFAULT
   }
 

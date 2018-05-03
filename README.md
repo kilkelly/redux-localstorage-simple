@@ -121,6 +121,7 @@ The `load` method takes a optional configuration object as an argument. It has t
 - states (Array, optional) - This is an optional array of strings specifying which parts of the Redux state tree you would like to load from LocalStorage. e.g. ["user", "products"]. These parts of the state tree must have been previously saved using the `save` method. Typically states have identical names to your Redux reducers. If you do not specify any states then your entire Redux state tree will be loaded from LocalStorage.
 - namespace (String, optional) - If you have saved your entire state tree or parts of your state tree with a namespace you will need to specify it in order to load it from LocalStorage.
 - preloadedState (Object, optional) - Passthrough for the `preloadedState` argument in Redux's `createStore` method. See section **Advanced Usage** below.
+- disableWarnings (Boolean, optional) - When you first try to a load a state from LocalStorage you will see a warning in the JavaScript console informing you that this state load is invalid. This is because the `save` method hasn't been called yet and this state has yet to been written to LocalStorage. You may not care to see this warning so to disable it set `disableWarnings` to true.
 
 #### Examples
 

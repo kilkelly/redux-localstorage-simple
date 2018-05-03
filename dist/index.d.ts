@@ -12,6 +12,7 @@ declare module 'redux-localstorage-simple' {
     namespace?: string;
     immutablejs?: boolean;
     preloadedState?: {};
+    disableWarnings?: boolean;
   }
   export function save(options?:RLSOptions):Middleware
   export function load(options?:LoadOptions):object

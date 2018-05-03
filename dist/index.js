@@ -24,7 +24,30 @@ var NAMESPACE_DEFAULT = 'redux_localstorage_simple';
 var STATES_DEFAULT = [];
 var DEBOUNCE_DEFAULT = 0;
 var IMMUTABLEJS_DEFAULT = false;
+var DISABLE_WARNINGS_DEFAULT = false;
 var debounceTimeout = null;
+
+// ---------------------------------------------------
+/* warn
+
+  DESCRIPTION
+  ----------
+  Write a warning to the console if warnings are enabled
+
+  PARAMETERS
+  ----------
+  @disableWarnings (Boolean) - If set to true then the warning is not written to the console
+  @warningMessage (String) - The message to write to the console
+
+*/
+
+function warn(disableWarnings) {
+  return function (warningMessage) {
+    if (!disableWarnings) {
+      console.warn(MODULE_NAME, warningMessage);
+    }
+  };
+}
 
 // ---------------------------------------------------
 /* lensPath
@@ -164,19 +187,19 @@ function save() {
 
         // Validate 'states' parameter
         if (!isArray(states)) {
-          console.error(MODULE_NAME, '\'states\' parameter in \'save()\' method was passed a non-array value. Setting default value instead. Check your \'save()\' method.');
+          console.error(MODULE_NAME, "'states' parameter in 'save()' method was passed a non-array value. Setting default value instead. Check your 'save()' method.");
           states = STATES_DEFAULT;
         }
 
         // Validate 'namespace' parameter
         if (!isString(namespace)) {
-          console.error(MODULE_NAME, '\'namespace\' parameter in \'save()\' method was passed a non-string value. Setting default value instead. Check your \'save()\' method.');
+          console.error(MODULE_NAME, "'namespace' parameter in 'save()' method was passed a non-string value. Setting default value instead. Check your 'save()' method.");
           namespace = NAMESPACE_DEFAULT;
         }
 
         // Validate 'debounce' parameter
         if (!isInteger(debounce)) {
-          console.error(MODULE_NAME, '\'debounce\' parameter in \'save()\' method was passed a non-integer value. Setting default value instead. Check your \'save()\' method.');
+          console.error(MODULE_NAME, "'debounce' parameter in 'save()' method was passed a non-integer value. Setting default value instead. Check your 'save()' method.");
           debounce = DEBOUNCE_DEFAULT;
         }
 
@@ -264,23 +287,28 @@ function load() {
       _ref2$namespace = _ref2.namespace,
       namespace = _ref2$namespace === undefined ? NAMESPACE_DEFAULT : _ref2$namespace,
       _ref2$preloadedState = _ref2.preloadedState,
-      preloadedState = _ref2$preloadedState === undefined ? {} : _ref2$preloadedState;
+      preloadedState = _ref2$preloadedState === undefined ? {} : _ref2$preloadedState,
+      _ref2$disableWarnings = _ref2.disableWarnings,
+      disableWarnings = _ref2$disableWarnings === undefined ? DISABLE_WARNINGS_DEFAULT : _ref2$disableWarnings;
+
+  // Bake disableWarnings into the warn function
+  var warn_ = warn(disableWarnings);
 
   // Validate 'states' parameter
   if (!isArray(states)) {
-    console.error(MODULE_NAME, '\'states\' parameter in \'load()\' method was passed a non-array value. Setting default value instead. Check your \'load()\' method.');
+    console.error(MODULE_NAME, "'states' parameter in 'load()' method was passed a non-array value. Setting default value instead. Check your 'load()' method.");
     states = STATES_DEFAULT;
   }
 
   // Validate 'namespace' parameter
   if (!isString(namespace)) {
-    console.error(MODULE_NAME, '\'namespace\' parameter in \'load()\' method was passed a non-string value. Setting default value instead. Check your \'load()\' method.');
+    console.error(MODULE_NAME, "'namespace' parameter in 'load()' method was passed a non-string value. Setting default value instead. Check your 'load()' method.");
     namespace = NAMESPACE_DEFAULT;
   }
 
   // Display immmutablejs deprecation notice if developer tries to utilise it
   if (immutablejs === true) {
-    console.error(MODULE_NAME, 'Support for Immutable.js data structures has been deprecated as of version 2.0.0. Please use version 1.4.0 if you require this functionality.');
+    warn_('Support for Immutable.js data structures has been deprecated as of version 2.0.0. Please use version 1.4.0 if you require this functionality.');
   }
 
   var loadedState = preloadedState;
@@ -296,7 +324,7 @@ function load() {
       if (localStorage[namespace + '_' + state]) {
         loadedState = (0, _objectMerge2.default)(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + '_' + state])));
       } else {
-        console.error(MODULE_NAME, "Invalid load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'");
+        warn_("Invalid load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.");
       }
     });
   }
@@ -331,7 +359,7 @@ function combineLoads() {
   loads.forEach(function (load) {
     // Make sure current 'load' is an object
     if (!isObject(load)) {
-      console.error(MODULE_NAME, 'One or more loads provided to \'combineLoads()\' is not a valid object. Ignoring the invalid load/s. Check your \'combineLoads()\' method.');
+      console.error(MODULE_NAME, "One or more loads provided to 'combineLoads()' is not a valid object. Ignoring the invalid load/s. Check your 'combineLoads()' method.");
       load = {};
     }
 
@@ -371,7 +399,7 @@ function clear() {
 
   // Validate 'namespace' parameter
   if (!isString(namespace)) {
-    console.error(MODULE_NAME, '\'namespace\' parameter in \'clear()\' method was passed a non-string value. Setting default value instead. Check your \'clear()\' method.');
+    console.error(MODULE_NAME, "'namespace' parameter in 'clear()' method was passed a non-string value. Setting default value instead. Check your 'clear()' method.");
     namespace = NAMESPACE_DEFAULT;
   }
 
