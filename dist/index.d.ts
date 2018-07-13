@@ -14,6 +14,11 @@ declare module 'redux-localstorage-simple' {
     preloadedState?: {};
     disableWarnings?: boolean;
   }
+  interface ClearOptions {
+    namespace?: string;
+  }  
   export function save(options?:RLSOptions):Middleware
   export function load(options?:LoadOptions):object
+  export function clear(options?:ClearOptions):void
+  export function combineLoads(...loads?:object[]):object
 }
