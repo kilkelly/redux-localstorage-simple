@@ -183,7 +183,7 @@ function save() {
   return function (store) {
     return function (next) {
       return function (action) {
-        next(action);
+        var returnValue = next(action);
 
         // Validate 'states' parameter
         if (!isArray(states)) {
@@ -240,6 +240,8 @@ function save() {
             });
           }
         }
+
+        return returnValue;
       };
     };
   };

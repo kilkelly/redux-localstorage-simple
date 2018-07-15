@@ -158,7 +158,7 @@ export function save ({
       debounce = DEBOUNCE_DEFAULT
     } = {}) {
   return store => next => action => {
-    next(action)
+    const returnValue = next(action)
 
     // Validate 'states' parameter
     if (!isArray(states)) {
@@ -215,6 +215,8 @@ export function save ({
         })
       }
     }
+
+    return returnValue
   }
 }
 
