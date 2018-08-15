@@ -20,5 +20,5 @@ declare module 'redux-localstorage-simple' {
   export function save(options?:RLSOptions):Middleware
   export function load(options?:LoadOptions):object
   export function clear(options?:ClearOptions):void
-  export function combineLoads(...loads?:object[]):object
+  export function combineLoads(...loads:object[]):object
 }
