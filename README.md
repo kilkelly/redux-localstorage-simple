@@ -166,7 +166,7 @@ Load parts of the state tree saved with different namespaces. Here are the `save
 ```sh
 applyMiddleware(
     save({ states: ["user"], namespace: "account_stuff" }),
-    load({ states: ["products", "categories"], namespace: "site_stuff" )
+    save({ states: ["products", "categories"], namespace: "site_stuff" )
 )
 ```
 
