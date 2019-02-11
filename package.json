@@ -29,10 +29,10 @@
     "object-merge": "2.5.1"
   },
   "devDependencies": {
-    "babel-cli": "6.9.0",
-    "babel-core": "6.9.1",
+    "babel-cli": "6.26.0",
+    "babel-core": "6.26.3",
     "babel-loader": "6.2.5",
-    "babel-preset-es2015": "6.9.0",
+    "babel-preset-es2015": "6.24.1",
     "deep-equal": "1.0.1",
     "redux": "3.6.0",
     "rimraf": "2.5.2",
