@@ -12,7 +12,6 @@ const NAMESPACE_TEST = 'namespace_test'
 // Actions
 var APPEND = 'APPEND'
 var ADD = 'ADD'
-var MULTIPLY = 'MULTIPLY'
 var MODIFY = 'MODIFY'
 var NOOP = 'NOOP'
 
@@ -75,11 +74,11 @@ var reducerMultipleLevels = function (state = initialStateReducerMultipleLevels,
   switch (action.type) {
     case MODIFY:
       return {
-        setting1: false,
-        setting2: true,
+        setting1: true, // modified
+        setting2: false,
         setting3: {
           level1: {
-            level2: 'hello'
+            level2: 'helloEdited' // modified
           }
         }
       }
@@ -339,7 +338,7 @@ clearTestData()
     initialStateReducersPlusMultipleLevels
   )
 
-  storeA.dispatch({ type: NOOP })
+  storeA.dispatch({ type: MODIFY })
 
   // Store which loads from LocalStorage
   let storeB = createStore(

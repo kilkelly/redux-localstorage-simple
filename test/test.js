@@ -74,7 +74,6 @@
 	// Actions
 	var APPEND = 'APPEND';
 	var ADD = 'ADD';
-	var MULTIPLY = 'MULTIPLY';
 	var MODIFY = 'MODIFY';
 	var NOOP = 'NOOP';
 
@@ -105,11 +104,10 @@
 
 	var initialStateReducersPlusMultipleLevels = {
 	  reducerMultipleLevels: initialStateReducerMultipleLevels
-	};
 
-	// -------------------------------------------------------------------------------
+	  // -------------------------------------------------------------------------------
 
-	var reducerA = function reducerA() {
+	};var reducerA = function reducerA() {
 	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialStateReducerA;
 	  var action = arguments[1];
 
@@ -146,11 +144,11 @@
 	  switch (action.type) {
 	    case MODIFY:
 	      return {
-	        setting1: false,
-	        setting2: true,
+	        setting1: true, // modified
+	        setting2: false,
 	        setting3: {
 	          level1: {
-	            level2: 'hello'
+	            level2: 'helloEdited' // modified
 	          }
 	        }
 	      };
@@ -368,7 +366,7 @@
 	  // Store which saves to LocalStorage
 	  var _storeA7 = (0, _redux.applyMiddleware)(_middleware4)(_redux.createStore)((0, _redux.combineReducers)({ reducerMultipleLevels: reducerMultipleLevels }), initialStateReducersPlusMultipleLevels);
 
-	  _storeA7.dispatch({ type: NOOP });
+	  _storeA7.dispatch({ type: MODIFY });
 
 	  // Store which loads from LocalStorage
 	  var _storeB7 = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerMultipleLevels: reducerMultipleLevels }), (0, _index.load)({
@@ -1810,7 +1808,7 @@
 	  return function (store) {
 	    return function (next) {
 	      return function (action) {
-	        next(action);
+	        var returnValue = next(action);
 
 	        // Validate 'states' parameter
 	        if (!isArray(states)) {
@@ -1867,6 +1865,8 @@
 	            });
 	          }
 	        }
+
+	        return returnValue;
 	      };
 	    };
 	  };
@@ -1948,7 +1948,7 @@
 	  } else {
 	    // Load only specified states into the local Redux state tree
 	    states.forEach(function (state) {
-	      if (localStorage[namespace + '_' + state]) {
+	      if (localStorage[namespace + '_' + state] !== 'undefined') {
 	        loadedState = (0, _objectMerge2.default)(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + '_' + state])));
 	      } else {
 	        warn_("Invalid load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.");
