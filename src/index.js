@@ -58,7 +58,9 @@ function warn (disableWarnings) {
 */
 
 function lensPath (path, obj) {
-  if (path.length === 1) {
+  if (obj === undefined) {
+    return null
+  } else if (path.length === 1) {
     return obj[path[0]]
   } else {
     return lensPath(path.slice(1), obj[path[0]])
@@ -210,8 +212,14 @@ export function save ({
       if (states.length === 0) {
         localStorage[namespace] = JSON.stringify(store.getState())
       } else {
-        states.forEach(state => {          
-          localStorage[namespace + '_' + state] = JSON.stringify(getStateForLocalStorage(state, store.getState()))
+        states.forEach(state => {
+          const stateForLocalStorage = getStateForLocalStorage(state, store.getState())
+          if (stateForLocalStorage) {
+            localStorage[namespace + '_' + state] = JSON.stringify(stateForLocalStorage)
+          } else {
+            // Make sure nothing is ever saved for this incorrect state
+            localStorage.removeItem(namespace + '_' + state)
+          }
         })
       }
     }
@@ -289,7 +297,7 @@ export function load ({
     }
   } else { // Load only specified states into the local Redux state tree
     states.forEach(function (state) {
-      if (localStorage[namespace + '_' + state] !== 'undefined') {
+      if (localStorage.getItem(namespace + '_' + state)) {
         loadedState = objectMerge(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + '_' + state])))
       } else {
         warn_("Invalid load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.")
