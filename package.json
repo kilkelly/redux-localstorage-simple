@@ -36,6 +36,6 @@
     "deep-equal": "1.0.1",
     "redux": "3.6.0",
     "rimraf": "2.5.2",
-    "webpack": "1.13.2"
+    "webpack": "2.7.0"
   }
 }
