@@ -21,6 +21,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var MODULE_NAME = '[Redux-LocalStorage-Simple]';
 var NAMESPACE_DEFAULT = 'redux_localstorage_simple';
+var NAMESPACE_SEPARATOR_DEFAULT = '_';
 var STATES_DEFAULT = [];
 var DEBOUNCE_DEFAULT = 0;
 var IMMUTABLEJS_DEFAULT = false;
@@ -179,6 +180,8 @@ function save() {
       states = _ref$states === undefined ? STATES_DEFAULT : _ref$states,
       _ref$namespace = _ref.namespace,
       namespace = _ref$namespace === undefined ? NAMESPACE_DEFAULT : _ref$namespace,
+      _ref$namespaceSeparat = _ref.namespaceSeparator,
+      namespaceSeparator = _ref$namespaceSeparat === undefined ? NAMESPACE_SEPARATOR_DEFAULT : _ref$namespaceSeparat,
       _ref$debounce = _ref.debounce,
       debounce = _ref$debounce === undefined ? DEBOUNCE_DEFAULT : _ref$debounce;
 
@@ -197,6 +200,12 @@ function save() {
         if (!isString(namespace)) {
           console.error(MODULE_NAME, "'namespace' parameter in 'save()' method was passed a non-string value. Setting default value instead. Check your 'save()' method.");
           namespace = NAMESPACE_DEFAULT;
+        }
+
+        // Validate 'namespaceSeparator' parameter
+        if (!isString(namespaceSeparator)) {
+          console.error(MODULE_NAME, "'namespaceSeparator' parameter in 'load()' method was passed a non-string value. Setting default value instead. Check your 'load()' method.");
+          namespaceSeparator = NAMESPACE_SEPARATOR_DEFAULT;
         }
 
         // Validate 'debounce' parameter
@@ -240,10 +249,10 @@ function save() {
             states.forEach(function (state) {
               var stateForLocalStorage = getStateForLocalStorage(state, store.getState());
               if (stateForLocalStorage) {
-                localStorage[namespace + '_' + state] = JSON.stringify(stateForLocalStorage);
+                localStorage[namespace + namespaceSeparator + state] = JSON.stringify(stateForLocalStorage);
               } else {
                 // Make sure nothing is ever saved for this incorrect state
-                localStorage.removeItem(namespace + '_' + state);
+                localStorage.removeItem(namespace + namespaceSeparator + state);
               }
             });
           }
@@ -296,6 +305,8 @@ function load() {
       immutablejs = _ref2$immutablejs === undefined ? IMMUTABLEJS_DEFAULT : _ref2$immutablejs,
       _ref2$namespace = _ref2.namespace,
       namespace = _ref2$namespace === undefined ? NAMESPACE_DEFAULT : _ref2$namespace,
+      _ref2$namespaceSepara = _ref2.namespaceSeparator,
+      namespaceSeparator = _ref2$namespaceSepara === undefined ? NAMESPACE_SEPARATOR_DEFAULT : _ref2$namespaceSepara,
       _ref2$preloadedState = _ref2.preloadedState,
       preloadedState = _ref2$preloadedState === undefined ? {} : _ref2$preloadedState,
       _ref2$disableWarnings = _ref2.disableWarnings,
@@ -316,6 +327,12 @@ function load() {
     namespace = NAMESPACE_DEFAULT;
   }
 
+  // Validate 'namespaceSeparator' parameter
+  if (!isString(namespaceSeparator)) {
+    console.error(MODULE_NAME, "'namespaceSeparator' parameter in 'load()' method was passed a non-string value. Setting default value instead. Check your 'load()' method.");
+    namespaceSeparator = NAMESPACE_SEPARATOR_DEFAULT;
+  }
+
   // Display immmutablejs deprecation notice if developer tries to utilise it
   if (immutablejs === true) {
     warn_('Support for Immutable.js data structures has been deprecated as of version 2.0.0. Please use version 1.4.0 if you require this functionality.');
@@ -331,10 +348,10 @@ function load() {
   } else {
     // Load only specified states into the local Redux state tree
     states.forEach(function (state) {
-      if (localStorage.getItem(namespace + '_' + state)) {
-        loadedState = (0, _objectMerge2.default)(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + '_' + state])));
+      if (localStorage.getItem(namespace + namespaceSeparator + state)) {
+        loadedState = (0, _objectMerge2.default)(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + namespaceSeparator + state])));
       } else {
-        warn_("Invalid load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.");
+        warn_("Invalid load '" + (namespace + namespaceSeparator + state) + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.");
       }
     });
   }
