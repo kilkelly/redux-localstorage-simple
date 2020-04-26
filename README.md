@@ -9,7 +9,7 @@ npm install --save redux-localstorage-simple
 
 ## Usage Example (ES6 code)
 
-```sh
+```js
 import { applyMiddleware, createStore } from "redux"
 import reducer from "./reducer"
 
@@ -42,7 +42,7 @@ const store = createStoreWithMiddleware(
 
 Saving to LocalStorage is achieved using [Redux middleware](http://redux.js.org/docs/advanced/Middleware.html) and saves each time an action is handled by your reducer. You will need to pass the `save` method into Redux's `applyMiddleware` method, like so...
 
-```sh
+```js
 applyMiddleware(save())
 ```
 
@@ -51,7 +51,7 @@ See the Usage Example above to get a better idea of how this works.
 #### Arguments
 The `save` method takes a optional configuration object as an argument. It has the following properties:
 
-```sh
+```
 {
     [Array states],
     [String namespace],
@@ -67,31 +67,31 @@ The `save` method takes a optional configuration object as an argument. It has t
 
 Save entire state tree - EASIEST OPTION.
 
-```sh
+```js
 save()
 ```
 
 Save specific parts of the state tree.
 
-```sh
+```js
 save({ states: ["user", "products"] })
 ```
 
 Save the entire state tree under the namespace "my_cool_app". The key "my_cool_app" will appear in LocalStorage.
 
-```sh
+```js
 save({ namespace: "my_cool_app" })
 ```
 
 Save the entire state tree only after a debouncing period of 500 milliseconds has elapsed
 
-```sh
+```js
 save({ debounce: 500 })
 ```
 
 Save specific parts of the state tree with the namespace "my_cool_app". The keys "my_cool_app_user" and "my_cool_app_products" will appear in LocalStorage.
 
-```sh
+```js
 save({
     states: ["user", "products"],
     namespace: "my_cool_app"
@@ -101,7 +101,7 @@ save({
 ### load([Object config])
 Loading Redux state from LocalStorage happens during creation of the Redux store.
 
-```sh
+```js
 createStore(reducer, load())    
 ```
 
@@ -110,7 +110,7 @@ See the Usage Example above to get a better idea of how this works.
 #### Arguments
 The `load` method takes a optional configuration object as an argument. It has the following properties:
 
-```sh
+```
 {
     [Array states],    
     [String namespace],
@@ -128,25 +128,25 @@ The `load` method takes a optional configuration object as an argument. It has t
 
 Load entire state tree - EASIEST OPTION.
 
-```sh
+```js
 load()
 ```
 
 Load specific parts of the state tree.
 
-```sh
+```js
 load({ states: ["user", "products"] })
 ```
 
 Load the entire state tree which was previously saved with the namespace "my_cool_app".
 
-```sh
+```js
 load({ namespace: "my_cool_app" })
 ```
 
 Load specific parts of the state tree which was previously saved with the namespace "my_cool_app".
 
-```sh
+```js
 load({ 
     states: ["user", "products"],
     namespace: "my_cool_app"
@@ -163,20 +163,20 @@ If you provided more than one call to `save` in your Redux middleware you will n
 
 Load parts of the state tree saved with different namespaces. Here are the `save` methods in your Redux middleware:
 
-```sh
+```js
 applyMiddleware(
     save({ states: ["user"], namespace: "account_stuff" }),
-    save({ states: ["products", "categories"], namespace: "site_stuff" )
+    save({ states: ["products", "categories"], namespace: "site_stuff" })
 )
 ```
 
 The corresponding use of `combineLoads` looks like this:
 
-```sh
+```js
 combineLoads( 
     load({ states: ["user"], namespace: "account_stuff" }),
-    load({ states: ["products", "categories"], namespace: "site_stuff" )
-)   
+    load({ states: ["products", "categories"], namespace: "site_stuff" })
+)
 ```
 
 ### clear([Object config])
@@ -187,7 +187,7 @@ Clears all Redux state tree data from LocalStorage. Note: only clears data which
 
 The `clear` method takes a optional configuration object as an argument. It has the following properties:
 
-```sh
+```
 {
     [String namespace]
 }
@@ -199,13 +199,13 @@ The `clear` method takes a optional configuration object as an argument. It has 
 
 Clear all Redux state tree data saved without a namespace.
 
-```sh
+```js
 clear()
 ```
 
 Clear Redux state tree data saved with a namespace.
 
-```sh
+```js
 clear({
     namespace: "my_cool_app"
 })  
@@ -217,22 +217,22 @@ In a more complex project you may find that you are saving unnecessary reducer d
 
 First let's look at a normal example. Let's say you have a reducer called `settings` and its state tree looks like this:
 
-```sh
+```js
 const settingsReducerInitialState = {
-    theme: 'light'
+    theme: 'light',
     itemsPerPage: 10
 }
 ```
 
 Using `redux-localstorage-simple`'s `save()` method for the `settings` reducer would look like this:
 
-```sh
+```js
 save({ states: ["settings"] })
 ```
 
 This saves all of the `settings` reducer's properties to LocalStorage. But wait, what if we really only care about saving the user's choice of `theme` and not `itemsPerPage`. Here's how to fix this:
 
-```sh
+```js
 save({ states: ["settings.theme"] })
 ```
 
@@ -240,7 +240,7 @@ This saves only the `theme` setting to LocalStorage. However this presents an ad
 
 Yes in most cases it would. So to prevent this you can use the `preloadedState` argument in the `load()` method to provide some initial data.
 
-```sh
+```js
 load({
     states: ["settings.theme"],
     preloadedState: {
