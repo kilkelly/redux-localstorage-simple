@@ -55,12 +55,14 @@ The `save` method takes a optional configuration object as an argument. It has t
 {
     [Array states],
     [String namespace],
+    [String namespaceSeparator],
     [Number debounce]
 }
 ```
 
 - states (Array, optional) - This is an optional array of strings specifying which parts of the Redux state tree you would like to save to LocalStorage. e.g. ["user", "products"]. Typically states have identical names to your Redux reducers. If you do not specify any states then your entire Redux state tree will be saved to LocalStorage.
 - namespace (String, optional) - This is an optional string specifying the namespace to add to your LocalStorage items. For example if you have a part of your Redux state tree called "user" and you specify the namespace "my_cool_app", it will be saved to LocalStorage as "my_cool_app_user"
+- namespaceSeparator (String, optional) - This is an optional string specifying the separator used between the namespace and the state keys. Using previous example with the namespaceSeparator set top "::", the key saved to the LocalStorage would be "my_cool_app::user"
 - debounce (Number, optional) - Debouncing period (in milliseconds) to wait before saving to LocalStorage. Use this as a performance optimization if you feel you are saving to LocalStorage too often. Recommended value: 500 - 1000 milliseconds
 
 #### Examples
@@ -81,6 +83,12 @@ Save the entire state tree under the namespace "my_cool_app". The key "my_cool_a
 
 ```js
 save({ namespace: "my_cool_app" })
+```
+
+Save the entire state tree under the namespace "my_cool_app" with the separator "::".
+
+```js
+save({ namespace: "my_cool_app", namespaceSeparator: "::" })
 ```
 
 Save the entire state tree only after a debouncing period of 500 milliseconds has elapsed
@@ -114,6 +122,7 @@ The `load` method takes a optional configuration object as an argument. It has t
 {
     [Array states],    
     [String namespace],
+    [String namespaceSeparator],
     [Object preloadedState],
     [Boolean disableWarnings]
 }
@@ -121,6 +130,7 @@ The `load` method takes a optional configuration object as an argument. It has t
 
 - states (Array, optional) - This is an optional array of strings specifying which parts of the Redux state tree you would like to load from LocalStorage. e.g. ["user", "products"]. These parts of the state tree must have been previously saved using the `save` method. Typically states have identical names to your Redux reducers. If you do not specify any states then your entire Redux state tree will be loaded from LocalStorage.
 - namespace (String, optional) - If you have saved your entire state tree or parts of your state tree with a namespace you will need to specify it in order to load it from LocalStorage.
+- namespaceSeparator (String, optional) - If you have saved entire state tree or parts of your state tree with a namespaceSeparator, you will need to specify it in order to load it from LocalStorage.
 - preloadedState (Object, optional) - Passthrough for the `preloadedState` argument in Redux's `createStore` method. See section **Advanced Usage** below.
 - disableWarnings (Boolean, optional) - When you first try to a load a state from LocalStorage you will see a warning in the JavaScript console informing you that this state load is invalid. This is because the `save` method hasn't been called yet and this state has yet to been written to LocalStorage. You may not care to see this warning so to disable it set `disableWarnings` to true.
 
@@ -142,6 +152,12 @@ Load the entire state tree which was previously saved with the namespace "my_coo
 
 ```js
 load({ namespace: "my_cool_app" })
+```
+
+Load the entire state tree which was previously saved with the namespace "my_cool_app" and a namespaceSeparator "::".
+
+```js
+load({ namespace: "my_cool_app", namespaceSeparator: "::" })
 ```
 
 Load specific parts of the state tree which was previously saved with the namespace "my_cool_app".
