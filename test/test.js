@@ -68,6 +68,7 @@
 
 	var NAMESPACE_DEFAULT = 'redux_localstorage_simple';
 	var NAMESPACE_TEST = 'namespace_test';
+	var NAMESPACE_SEPARATOR_TEST = '**';
 
 	// -------------------------------------------------------------------------------
 
@@ -259,21 +260,65 @@
 	  outputTestResult('test4', _testResult3);
 	}
 
+	// -------------------------------------------------------------------------------------------------
+	// TEST 5 - Save and load entire Redux state tree under a specified namespace and namespaceSeparator
+	// -------------------------------------------------------------------------------------------------
+	clearTestData();
+
+	{
+	  var _middleware4 = (0, _index.save)({ namespace: NAMESPACE_TEST, namespaceSeparator: NAMESPACE_SEPARATOR_TEST });
+
+	  // Store which saves to LocalStorage
+	  var _storeA4 = (0, _redux.applyMiddleware)(_middleware4)(_redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), initialStateReducers);
+
+	  // Trigger a save to LocalStorage using a noop action
+	  _storeA4.dispatch({ type: NOOP });
+
+	  // Store which loads from LocalStorage
+	  var _storeB4 = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), (0, _index.load)({ namespace: NAMESPACE_TEST, namespaceSeparator: NAMESPACE_SEPARATOR_TEST }));
+
+	  var _testResult4 = (0, _deepEqual2.default)(_storeA4.getState(), _storeB4.getState());
+
+	  outputTestResult('test5', _testResult4);
+	}
+
+	// ------------------------------------------------------------------------------------------------------
+	// TEST 6 - Save and load part of the Redux state tree under a specified namespace and namespaceSeparator
+	// ------------------------------------------------------------------------------------------------------
+	clearTestData();
+
+	{
+	  var _middleware5 = (0, _index.save)({ states: ['reducerA'], namespace: NAMESPACE_TEST, namespaceSeparator: NAMESPACE_SEPARATOR_TEST });
+
+	  // Store which saves to LocalStorage
+	  var _storeA5 = (0, _redux.applyMiddleware)(_middleware5)(_redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), initialStateReducers);
+
+	  // Trigger a save to LocalStorage using an append action
+	  _storeA5.dispatch({ type: APPEND });
+
+	  // Store which loads from LocalStorage
+	  var _storeB5 = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerA: reducerA, reducerB: reducerB }), (0, _index.load)({ states: ['reducerA'], namespace: NAMESPACE_TEST, namespaceSeparator: NAMESPACE_SEPARATOR_TEST }));
+
+	  var _testResult5 = (0, _deepEqual2.default)(_storeA5.getState(), _storeB5.getState());
+
+	  outputTestResult('test6', _testResult5);
+	}
+
 	// -------------------------------------------------------------------------------
-	// TEST 5 - Clear Redux state tree data saved without a specific namespace
+	// TEST 7 - Clear Redux state tree data saved without a specific namespace
 	// -------------------------------------------------------------------------------
 	clearTestData();
 
 	{
 	  // Store that saves without a namespace
-	  var _storeA4 = (0, _redux.applyMiddleware)((0, _index.save)())(_redux.createStore)(reducerA, initialStateReducerA);
+	  var _storeA6 = (0, _redux.applyMiddleware)((0, _index.save)())(_redux.createStore)(reducerA, initialStateReducerA);
 	  // Trigger a save to LocalStorage using a noop action
-	  _storeA4.dispatch({ type: NOOP });
+	  _storeA6.dispatch({ type: NOOP });
 
 	  // Store that saves WITH a namespace
-	  var _storeB4 = (0, _redux.applyMiddleware)((0, _index.save)({ namespace: NAMESPACE_TEST }))(_redux.createStore)(reducerA, initialStateReducerA);
+	  var _storeB6 = (0, _redux.applyMiddleware)((0, _index.save)({ namespace: NAMESPACE_TEST }))(_redux.createStore)(reducerA, initialStateReducerA);
 	  // Trigger a save to LocalStorage using a noop action
-	  _storeB4.dispatch({ type: NOOP });
+	  _storeB6.dispatch({ type: NOOP });
 
 	  // Perform the LocalStorage clearing
 	  (0, _index.clear)();
@@ -289,20 +334,20 @@
 	}
 
 	// -------------------------------------------------------------------------------
-	// TEST 6 - Clear Redux state tree data saved with a specific namespace
+	// TEST 8 - Clear Redux state tree data saved with a specific namespace
 	// -------------------------------------------------------------------------------
 	clearTestData();
 
 	{
 	  // Store that saves without a namespace
-	  var _storeA5 = (0, _redux.applyMiddleware)((0, _index.save)())(_redux.createStore)(reducerA, initialStateReducerA);
+	  var _storeA7 = (0, _redux.applyMiddleware)((0, _index.save)())(_redux.createStore)(reducerA, initialStateReducerA);
 	  // Trigger a save to LocalStorage using a noop action
-	  _storeA5.dispatch({ type: NOOP });
+	  _storeA7.dispatch({ type: NOOP });
 
 	  // Store that saves WITH a namespace
-	  var _storeB5 = (0, _redux.applyMiddleware)((0, _index.save)({ namespace: NAMESPACE_TEST }))(_redux.createStore)(reducerA, initialStateReducerA);
+	  var _storeB7 = (0, _redux.applyMiddleware)((0, _index.save)({ namespace: NAMESPACE_TEST }))(_redux.createStore)(reducerA, initialStateReducerA);
 	  // Trigger a save to LocalStorage using a noop action
-	  _storeB5.dispatch({ type: NOOP });
+	  _storeB7.dispatch({ type: NOOP });
 
 	  // Perform the LocalStorage clearing
 	  (0, _index.clear)({ namespace: NAMESPACE_TEST });
@@ -318,7 +363,7 @@
 	}
 
 	// -------------------------------------------------------------------------------
-	// TEST 7 - Save Redux state with debouncing
+	// TEST 9 - Save Redux state with debouncing
 	// -------------------------------------------------------------------------------
 
 	clearTestData();
@@ -327,16 +372,16 @@
 	  var debouncingPeriod = 500;
 
 	  // Store that saves with a debouncing period
-	  var _storeA6 = (0, _redux.applyMiddleware)((0, _index.save)({ debounce: debouncingPeriod }))(_redux.createStore)(reducerB, initialStateReducerB);
+	  var _storeA8 = (0, _redux.applyMiddleware)((0, _index.save)({ debounce: debouncingPeriod }))(_redux.createStore)(reducerB, initialStateReducerB);
 	  // Trigger a save to LocalStorage using an add action
-	  _storeA6.dispatch({ type: ADD });
+	  _storeA8.dispatch({ type: ADD });
 
 	  // Store which loads from LocalStorage
-	  var _storeB6 = (0, _redux.createStore)(reducerB, (0, _index.load)());
+	  var _storeB8 = (0, _redux.createStore)(reducerB, (0, _index.load)());
 	  // This test result should fail because the debouncing period has
 	  // delayed the data being written to LocalStorage
-	  var _testResult4 = _storeB6.getState()['y'] === 1;
-	  outputTestResult('test9', _testResult4);
+	  var _testResult6 = _storeB8.getState()['y'] === 1;
+	  outputTestResult('test9', _testResult6);
 
 	  // This timeout will recheck LocalStorage after a period longer than
 	  // our specified debouncing period. Therefore it will see the updated
@@ -353,7 +398,7 @@
 	}
 
 	// -------------------------------------------------------------------------------
-	// TEST 8 - Save and load specific properties of a <u>part</u> of Redux state tree under a specified <u>namespace</u>
+	// TEST 10 - Save and load specific properties of a <u>part</u> of Redux state tree under a specified <u>namespace</u>
 	// -------------------------------------------------------------------------------
 	clearTestData();
 
@@ -361,23 +406,23 @@
 
 	  var states = ['reducerMultipleLevels.setting1', 'reducerMultipleLevels.setting3.level1.level2'];
 
-	  var _middleware4 = (0, _index.save)({ states: states, namespace: NAMESPACE_TEST });
+	  var _middleware6 = (0, _index.save)({ states: states, namespace: NAMESPACE_TEST });
 
 	  // Store which saves to LocalStorage
-	  var _storeA7 = (0, _redux.applyMiddleware)(_middleware4)(_redux.createStore)((0, _redux.combineReducers)({ reducerMultipleLevels: reducerMultipleLevels }), initialStateReducersPlusMultipleLevels);
+	  var _storeA9 = (0, _redux.applyMiddleware)(_middleware6)(_redux.createStore)((0, _redux.combineReducers)({ reducerMultipleLevels: reducerMultipleLevels }), initialStateReducersPlusMultipleLevels);
 
-	  _storeA7.dispatch({ type: MODIFY });
+	  _storeA9.dispatch({ type: MODIFY });
 
 	  // Store which loads from LocalStorage
-	  var _storeB7 = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerMultipleLevels: reducerMultipleLevels }), (0, _index.load)({
+	  var _storeB9 = (0, _redux.createStore)((0, _redux.combineReducers)({ reducerMultipleLevels: reducerMultipleLevels }), (0, _index.load)({
 	    states: states,
 	    namespace: NAMESPACE_TEST,
 	    preloadedState: initialStateReducersPlusMultipleLevels
 	  }));
 
-	  var _testResult5 = (0, _deepEqual2.default)(_storeA7.getState(), _storeB7.getState());
+	  var _testResult7 = (0, _deepEqual2.default)(_storeA9.getState(), _storeB9.getState());
 
-	  outputTestResult('test10', _testResult5);
+	  outputTestResult('test10', _testResult7);
 	}
 
 	// -------------------------------------------------------------------------------
@@ -1646,6 +1691,7 @@
 
 	var MODULE_NAME = '[Redux-LocalStorage-Simple]';
 	var NAMESPACE_DEFAULT = 'redux_localstorage_simple';
+	var NAMESPACE_SEPARATOR_DEFAULT = '_';
 	var STATES_DEFAULT = [];
 	var DEBOUNCE_DEFAULT = 0;
 	var IMMUTABLEJS_DEFAULT = false;
@@ -1804,6 +1850,8 @@
 	      states = _ref$states === undefined ? STATES_DEFAULT : _ref$states,
 	      _ref$namespace = _ref.namespace,
 	      namespace = _ref$namespace === undefined ? NAMESPACE_DEFAULT : _ref$namespace,
+	      _ref$namespaceSeparat = _ref.namespaceSeparator,
+	      namespaceSeparator = _ref$namespaceSeparat === undefined ? NAMESPACE_SEPARATOR_DEFAULT : _ref$namespaceSeparat,
 	      _ref$debounce = _ref.debounce,
 	      debounce = _ref$debounce === undefined ? DEBOUNCE_DEFAULT : _ref$debounce;
 
@@ -1822,6 +1870,12 @@
 	        if (!isString(namespace)) {
 	          console.error(MODULE_NAME, "'namespace' parameter in 'save()' method was passed a non-string value. Setting default value instead. Check your 'save()' method.");
 	          namespace = NAMESPACE_DEFAULT;
+	        }
+
+	        // Validate 'namespaceSeparator' parameter
+	        if (!isString(namespaceSeparator)) {
+	          console.error(MODULE_NAME, "'namespaceSeparator' parameter in 'load()' method was passed a non-string value. Setting default value instead. Check your 'load()' method.");
+	          namespaceSeparator = NAMESPACE_SEPARATOR_DEFAULT;
 	        }
 
 	        // Validate 'debounce' parameter
@@ -1865,10 +1919,10 @@
 	            states.forEach(function (state) {
 	              var stateForLocalStorage = getStateForLocalStorage(state, store.getState());
 	              if (stateForLocalStorage) {
-	                localStorage[namespace + '_' + state] = JSON.stringify(stateForLocalStorage);
+	                localStorage[namespace + namespaceSeparator + state] = JSON.stringify(stateForLocalStorage);
 	              } else {
 	                // Make sure nothing is ever saved for this incorrect state
-	                localStorage.removeItem(namespace + '_' + state);
+	                localStorage.removeItem(namespace + namespaceSeparator + state);
 	              }
 	            });
 	          }
@@ -1921,6 +1975,8 @@
 	      immutablejs = _ref2$immutablejs === undefined ? IMMUTABLEJS_DEFAULT : _ref2$immutablejs,
 	      _ref2$namespace = _ref2.namespace,
 	      namespace = _ref2$namespace === undefined ? NAMESPACE_DEFAULT : _ref2$namespace,
+	      _ref2$namespaceSepara = _ref2.namespaceSeparator,
+	      namespaceSeparator = _ref2$namespaceSepara === undefined ? NAMESPACE_SEPARATOR_DEFAULT : _ref2$namespaceSepara,
 	      _ref2$preloadedState = _ref2.preloadedState,
 	      preloadedState = _ref2$preloadedState === undefined ? {} : _ref2$preloadedState,
 	      _ref2$disableWarnings = _ref2.disableWarnings,
@@ -1941,6 +1997,12 @@
 	    namespace = NAMESPACE_DEFAULT;
 	  }
 
+	  // Validate 'namespaceSeparator' parameter
+	  if (!isString(namespaceSeparator)) {
+	    console.error(MODULE_NAME, "'namespaceSeparator' parameter in 'load()' method was passed a non-string value. Setting default value instead. Check your 'load()' method.");
+	    namespaceSeparator = NAMESPACE_SEPARATOR_DEFAULT;
+	  }
+
 	  // Display immmutablejs deprecation notice if developer tries to utilise it
 	  if (immutablejs === true) {
 	    warn_('Support for Immutable.js data structures has been deprecated as of version 2.0.0. Please use version 1.4.0 if you require this functionality.');
@@ -1956,10 +2018,10 @@
 	  } else {
 	    // Load only specified states into the local Redux state tree
 	    states.forEach(function (state) {
-	      if (localStorage.getItem(namespace + '_' + state)) {
-	        loadedState = (0, _objectMerge2.default)(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + '_' + state])));
+	      if (localStorage.getItem(namespace + namespaceSeparator + state)) {
+	        loadedState = (0, _objectMerge2.default)(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + namespaceSeparator + state])));
 	      } else {
-	        warn_("Invalid load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.");
+	        warn_("Invalid load '" + (namespace + namespaceSeparator + state) + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.");
 	      }
 	    });
 	  }

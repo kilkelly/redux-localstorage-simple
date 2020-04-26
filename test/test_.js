@@ -6,6 +6,7 @@ import equal from 'deep-equal'
 
 const NAMESPACE_DEFAULT = 'redux_localstorage_simple'
 const NAMESPACE_TEST = 'namespace_test'
+const NAMESPACE_SEPARATOR_TEST = '**'
 
 // -------------------------------------------------------------------------------
 
@@ -225,8 +226,70 @@ clearTestData()
   outputTestResult('test4', testResult)
 }
 
+// -------------------------------------------------------------------------------------------------
+// TEST 5 - Save and load entire Redux state tree under a specified namespace and namespaceSeparator
+// -------------------------------------------------------------------------------------------------
+clearTestData()
+
+{
+  let middleware = save({ namespace: NAMESPACE_TEST, namespaceSeparator: NAMESPACE_SEPARATOR_TEST })
+
+  // Store which saves to LocalStorage
+  let storeA = applyMiddleware(middleware)(createStore)(
+    combineReducers({ reducerA, reducerB }),
+    initialStateReducers
+  )
+
+  // Trigger a save to LocalStorage using a noop action
+  storeA.dispatch({ type: NOOP })
+
+  // Store which loads from LocalStorage
+  let storeB = createStore(
+    combineReducers({ reducerA, reducerB }),
+    load({ namespace: NAMESPACE_TEST, namespaceSeparator: NAMESPACE_SEPARATOR_TEST })
+  )
+
+  let testResult = equal(
+    storeA.getState(),
+    storeB.getState()
+  )
+
+  outputTestResult('test5', testResult)
+}
+
+// ------------------------------------------------------------------------------------------------------
+// TEST 6 - Save and load part of the Redux state tree under a specified namespace and namespaceSeparator
+// ------------------------------------------------------------------------------------------------------
+clearTestData()
+
+{
+  let middleware = save({ states: ['reducerA'], namespace: NAMESPACE_TEST, namespaceSeparator: NAMESPACE_SEPARATOR_TEST })
+
+  // Store which saves to LocalStorage
+  let storeA = applyMiddleware(middleware)(createStore)(
+    combineReducers({ reducerA, reducerB }),
+    initialStateReducers
+  )
+
+  // Trigger a save to LocalStorage using an append action
+  storeA.dispatch({ type: APPEND })
+
+  // Store which loads from LocalStorage
+  let storeB = createStore(
+    combineReducers({ reducerA, reducerB }),
+    load({ states: ['reducerA'], namespace: NAMESPACE_TEST, namespaceSeparator: NAMESPACE_SEPARATOR_TEST })
+  )
+
+  let testResult = equal(
+    storeA.getState(),
+    storeB.getState()
+  )
+
+  outputTestResult('test6', testResult)
+}
+
 // -------------------------------------------------------------------------------
-// TEST 5 - Clear Redux state tree data saved without a specific namespace
+// TEST 7 - Clear Redux state tree data saved without a specific namespace
 // -------------------------------------------------------------------------------
 clearTestData()
 
@@ -255,7 +318,7 @@ clearTestData()
 }
 
 // -------------------------------------------------------------------------------
-// TEST 6 - Clear Redux state tree data saved with a specific namespace
+// TEST 8 - Clear Redux state tree data saved with a specific namespace
 // -------------------------------------------------------------------------------
 clearTestData()
 
@@ -284,7 +347,7 @@ clearTestData()
 }
 
 // -------------------------------------------------------------------------------
-// TEST 7 - Save Redux state with debouncing
+// TEST 9 - Save Redux state with debouncing
 // -------------------------------------------------------------------------------
 
 clearTestData()
@@ -319,7 +382,7 @@ clearTestData()
 }
 
 // -------------------------------------------------------------------------------
-// TEST 8 - Save and load specific properties of a <u>part</u> of Redux state tree under a specified <u>namespace</u>
+// TEST 10 - Save and load specific properties of a <u>part</u> of Redux state tree under a specified <u>namespace</u>
 // -------------------------------------------------------------------------------
 clearTestData()
 
