@@ -4,6 +4,7 @@ import objectMerge from 'object-merge'
 
 const MODULE_NAME = '[Redux-LocalStorage-Simple]'
 const NAMESPACE_DEFAULT = 'redux_localstorage_simple'
+const NAMESPACE_SEPARATOR_DEFAULT = '_'
 const STATES_DEFAULT = []
 const DEBOUNCE_DEFAULT = 0
 const IMMUTABLEJS_DEFAULT = false
@@ -157,6 +158,7 @@ function realiseObject (objectPath, objectInitialValue = {}) {
 export function save ({
       states = STATES_DEFAULT,
       namespace = NAMESPACE_DEFAULT,
+      namespaceSeparator = NAMESPACE_SEPARATOR_DEFAULT,
       debounce = DEBOUNCE_DEFAULT
     } = {}) {
   return store => next => action => {
@@ -172,6 +174,12 @@ export function save ({
     if (!isString(namespace)) {
       console.error(MODULE_NAME, "'namespace' parameter in 'save()' method was passed a non-string value. Setting default value instead. Check your 'save()' method.")
       namespace = NAMESPACE_DEFAULT
+    }
+
+    // Validate 'namespaceSeparator' parameter
+    if (!isString(namespaceSeparator)) {
+      console.error(MODULE_NAME, "'namespaceSeparator' parameter in 'load()' method was passed a non-string value. Setting default value instead. Check your 'load()' method.")
+      namespaceSeparator = NAMESPACE_SEPARATOR_DEFAULT
     }
 
     // Validate 'debounce' parameter
@@ -215,10 +223,10 @@ export function save ({
         states.forEach(state => {
           const stateForLocalStorage = getStateForLocalStorage(state, store.getState())
           if (stateForLocalStorage) {
-            localStorage[namespace + '_' + state] = JSON.stringify(stateForLocalStorage)
+            localStorage[namespace + namespaceSeparator + state] = JSON.stringify(stateForLocalStorage)
           } else {
             // Make sure nothing is ever saved for this incorrect state
-            localStorage.removeItem(namespace + '_' + state)
+            localStorage.removeItem(namespace + namespaceSeparator + state)
           }
         })
       }
@@ -265,6 +273,7 @@ export function load ({
       states = STATES_DEFAULT,
       immutablejs = IMMUTABLEJS_DEFAULT,
       namespace = NAMESPACE_DEFAULT,
+      namespaceSeparator = NAMESPACE_SEPARATOR_DEFAULT,
       preloadedState = {},
       disableWarnings = DISABLE_WARNINGS_DEFAULT
     } = {}) {
@@ -283,6 +292,12 @@ export function load ({
     namespace = NAMESPACE_DEFAULT
   }
 
+  // Validate 'namespaceSeparator' parameter
+  if (!isString(namespaceSeparator)) {
+    console.error(MODULE_NAME, "'namespaceSeparator' parameter in 'load()' method was passed a non-string value. Setting default value instead. Check your 'load()' method.")
+    namespaceSeparator = NAMESPACE_SEPARATOR_DEFAULT
+  }
+
   // Display immmutablejs deprecation notice if developer tries to utilise it
   if (immutablejs === true) {
     warn_('Support for Immutable.js data structures has been deprecated as of version 2.0.0. Please use version 1.4.0 if you require this functionality.')
@@ -297,10 +312,10 @@ export function load ({
     }
   } else { // Load only specified states into the local Redux state tree
     states.forEach(function (state) {
-      if (localStorage.getItem(namespace + '_' + state)) {
-        loadedState = objectMerge(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + '_' + state])))
+      if (localStorage.getItem(namespace + namespaceSeparator + state)) {
+        loadedState = objectMerge(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + namespaceSeparator + state])))
       } else {
-        warn_("Invalid load '" + (namespace + '_' + state) + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.")
+        warn_("Invalid load '" + (namespace + namespaceSeparator + state) + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.")
       }
     })
   }
