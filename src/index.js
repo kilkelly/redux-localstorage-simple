@@ -6,6 +6,7 @@ const MODULE_NAME = '[Redux-LocalStorage-Simple]'
 const NAMESPACE_DEFAULT = 'redux_localstorage_simple'
 const NAMESPACE_SEPARATOR_DEFAULT = '_'
 const STATES_DEFAULT = []
+const IGNORE_STATES_DEFAULT = []
 const DEBOUNCE_DEFAULT = 0
 const IMMUTABLEJS_DEFAULT = false
 const DISABLE_WARNINGS_DEFAULT = false
@@ -157,17 +158,36 @@ function realiseObject (objectPath, objectInitialValue = {}) {
 
 export function save ({
       states = STATES_DEFAULT,
+      ignoreStates = IGNORE_STATES_DEFAULT,
       namespace = NAMESPACE_DEFAULT,
       namespaceSeparator = NAMESPACE_SEPARATOR_DEFAULT,
       debounce = DEBOUNCE_DEFAULT
     } = {}) {
   return store => next => action => {
     const returnValue = next(action)
+    let state_
 
     // Validate 'states' parameter
     if (!isArray(states)) {
       console.error(MODULE_NAME, "'states' parameter in 'save()' method was passed a non-array value. Setting default value instead. Check your 'save()' method.")
       states = STATES_DEFAULT
+    }
+
+    // Validate 'ignoreStates' parameter
+    if (!isArray(ignoreStates)) {
+      console.error(MODULE_NAME, "'ignoreStates' parameter in 'save()' method was passed a non-array value. Setting default value instead. Check your 'save()' method.")
+      ignoreStates = IGNORE_STATES_DEFAULT
+    }
+
+    // Validate individual entries in'ignoreStates' parameter
+    if (ignoreStates.length > 0) {
+      ignoreStates = ignoreStates.filter(function (ignoreState) {
+        if (!isString(ignoreState)) {
+          console.error(MODULE_NAME, "'ignoreStates' array contains a non-string value. Ignoring this value. Check your 'ignoreStates' array.")
+        } else {
+          return ignoreState
+        }
+      })
     }
 
     // Validate 'namespace' parameter
@@ -186,6 +206,13 @@ export function save ({
     if (!isInteger(debounce)) {
       console.error(MODULE_NAME, "'debounce' parameter in 'save()' method was passed a non-integer value. Setting default value instead. Check your 'save()' method.")
       debounce = DEBOUNCE_DEFAULT
+    }
+
+    // Check if there are states to ignore
+    if (ignoreStates.length > 0) {
+      state_= handleIgnoreStates(ignoreStates, store.getState())
+    } else {
+      state_= store.getState()
     }
 
     // Check to see whether to debounce LocalStorage saving
@@ -214,14 +241,14 @@ export function save ({
         return lensPath([state], rootState)
       }
     }
- 
+
     // Local function to avoid duplication of code above
     function _save () {
       if (states.length === 0) {
-        localStorage[namespace] = JSON.stringify(store.getState())
+        localStorage[namespace] = JSON.stringify(state_)
       } else {
         states.forEach(state => {
-          const stateForLocalStorage = getStateForLocalStorage(state, store.getState())
+          const stateForLocalStorage = getStateForLocalStorage(state, state_)
           if (stateForLocalStorage) {
             localStorage[namespace + namespaceSeparator + state] = JSON.stringify(stateForLocalStorage)
           } else {
@@ -413,4 +440,15 @@ function isInteger (value) {
 
 function isObject (value) {
   return value !== null && typeof value === 'object'
+}
+
+// Removes ignored states from the main state object
+function handleIgnoreStates (ignoreStates, stateFull) {
+  let stateFullMinusIgnoreStates = Object.entries(stateFull).reduce(function (acc, [key, value]) {
+    if (ignoreStates.indexOf(key) === -1) {
+      acc[key] = stateFull[key]
+    }
+    return acc
+  }, {})
+  return stateFullMinusIgnoreStates
 }

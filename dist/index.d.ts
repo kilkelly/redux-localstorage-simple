@@ -4,7 +4,9 @@ import * as m from 'redux-localstorage-simple';
 declare module 'redux-localstorage-simple' {
   interface RLSOptions {
     states?: string[];
+    ignoreStates?: string[];
     namespace?: string;
+    namespaceSeparator?: string;
     debounce?: number;
   }
   interface LoadOptions {

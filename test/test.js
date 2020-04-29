@@ -426,6 +426,51 @@
 	}
 
 	// -------------------------------------------------------------------------------
+	// TEST 11 - Save and load entire Redux state tree except the states we ignore
+	// -------------------------------------------------------------------------------
+	clearTestData();
+
+	{
+
+	  var initialState = {
+	    z1: 0,
+	    z2: 'z',
+	    z3: 1
+	  };
+
+	  var successState = {
+	    z2: 'z'
+	  };
+
+	  var reducer = function reducer() {
+	    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+	    var action = arguments[1];
+
+	    switch (action.type) {
+	      case NOOP:
+	        return state;
+	      default:
+	        return state;
+	    }
+	  };
+
+	  var _middleware7 = (0, _index.save)({ ignoreStates: ['z1', 'z3'] });
+
+	  // Store which saves to LocalStorage
+	  var _storeA10 = (0, _redux.applyMiddleware)(_middleware7)(_redux.createStore)(reducer);
+
+	  // Trigger a save to LocalStorage using a noop action
+	  _storeA10.dispatch({ type: NOOP });
+
+	  // Store which loads from LocalStorage
+	  var _storeB10 = (0, _redux.createStore)(reducer, (0, _index.load)());
+
+	  var _testResult8 = (0, _deepEqual2.default)(successState, _storeB10.getState());
+
+	  outputTestResult('test11', _testResult8);
+	}
+
+	// -------------------------------------------------------------------------------
 
 	// Output result of test in browser
 	function outputTestResult(test, testResult) {
@@ -1674,6 +1719,8 @@
 	  value: true
 	});
 
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 	exports.save = save;
@@ -1693,6 +1740,7 @@
 	var NAMESPACE_DEFAULT = 'redux_localstorage_simple';
 	var NAMESPACE_SEPARATOR_DEFAULT = '_';
 	var STATES_DEFAULT = [];
+	var IGNORE_STATES_DEFAULT = [];
 	var DEBOUNCE_DEFAULT = 0;
 	var IMMUTABLEJS_DEFAULT = false;
 	var DISABLE_WARNINGS_DEFAULT = false;
@@ -1848,6 +1896,8 @@
 	  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
 	      _ref$states = _ref.states,
 	      states = _ref$states === undefined ? STATES_DEFAULT : _ref$states,
+	      _ref$ignoreStates = _ref.ignoreStates,
+	      ignoreStates = _ref$ignoreStates === undefined ? IGNORE_STATES_DEFAULT : _ref$ignoreStates,
 	      _ref$namespace = _ref.namespace,
 	      namespace = _ref$namespace === undefined ? NAMESPACE_DEFAULT : _ref$namespace,
 	      _ref$namespaceSeparat = _ref.namespaceSeparator,
@@ -1859,11 +1909,29 @@
 	    return function (next) {
 	      return function (action) {
 	        var returnValue = next(action);
+	        var state_ = void 0;
 
 	        // Validate 'states' parameter
 	        if (!isArray(states)) {
 	          console.error(MODULE_NAME, "'states' parameter in 'save()' method was passed a non-array value. Setting default value instead. Check your 'save()' method.");
 	          states = STATES_DEFAULT;
+	        }
+
+	        // Validate 'ignoreStates' parameter
+	        if (!isArray(ignoreStates)) {
+	          console.error(MODULE_NAME, "'ignoreStates' parameter in 'save()' method was passed a non-array value. Setting default value instead. Check your 'save()' method.");
+	          ignoreStates = IGNORE_STATES_DEFAULT;
+	        }
+
+	        // Validate individual entries in'ignoreStates' parameter
+	        if (ignoreStates.length > 0) {
+	          ignoreStates = ignoreStates.filter(function (ignoreState) {
+	            if (!isString(ignoreState)) {
+	              console.error(MODULE_NAME, "'ignoreStates' array contains a non-string value. Ignoring this value. Check your 'ignoreStates' array.");
+	            } else {
+	              return ignoreState;
+	            }
+	          });
 	        }
 
 	        // Validate 'namespace' parameter
@@ -1882,6 +1950,13 @@
 	        if (!isInteger(debounce)) {
 	          console.error(MODULE_NAME, "'debounce' parameter in 'save()' method was passed a non-integer value. Setting default value instead. Check your 'save()' method.");
 	          debounce = DEBOUNCE_DEFAULT;
+	        }
+
+	        // Check if there are states to ignore
+	        if (ignoreStates.length > 0) {
+	          state_ = handleIgnoreStates(ignoreStates, store.getState());
+	        } else {
+	          state_ = store.getState();
 	        }
 
 	        // Check to see whether to debounce LocalStorage saving
@@ -1914,10 +1989,10 @@
 	        // Local function to avoid duplication of code above
 	        function _save() {
 	          if (states.length === 0) {
-	            localStorage[namespace] = JSON.stringify(store.getState());
+	            localStorage[namespace] = JSON.stringify(state_);
 	          } else {
 	            states.forEach(function (state) {
-	              var stateForLocalStorage = getStateForLocalStorage(state, store.getState());
+	              var stateForLocalStorage = getStateForLocalStorage(state, state_);
 	              if (stateForLocalStorage) {
 	                localStorage[namespace + namespaceSeparator + state] = JSON.stringify(stateForLocalStorage);
 	              } else {
@@ -2125,6 +2200,21 @@
 
 	function isObject(value) {
 	  return value !== null && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object';
+	}
+
+	// Removes ignored states from the main state object
+	function handleIgnoreStates(ignoreStates, stateFull) {
+	  var stateFullMinusIgnoreStates = Object.entries(stateFull).reduce(function (acc, _ref4) {
+	    var _ref5 = _slicedToArray(_ref4, 2),
+	        key = _ref5[0],
+	        value = _ref5[1];
+
+	    if (ignoreStates.indexOf(key) === -1) {
+	      acc[key] = stateFull[key];
+	    }
+	    return acc;
+	  }, {});
+	  return stateFullMinusIgnoreStates;
 	}
 
 /***/ },

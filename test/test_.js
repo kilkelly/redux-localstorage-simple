@@ -422,6 +422,54 @@ clearTestData()
 }
 
 // -------------------------------------------------------------------------------
+// TEST 11 - Save and load entire Redux state tree except the states we ignore
+// -------------------------------------------------------------------------------
+clearTestData()
+
+{
+
+  let initialState = {
+    z1: 0,
+    z2: 'z',
+    z3: 1
+  }
+
+  let successState = {
+    z2: 'z'
+  }
+
+  let reducer = function (state = initialState, action) {
+    switch (action.type) {
+      case NOOP:
+        return state
+      default:
+        return state
+    }
+  }
+
+  let middleware = save({ ignoreStates: ['z1', 'z3'] })
+
+  // Store which saves to LocalStorage
+  let storeA = applyMiddleware(middleware)(createStore)(reducer)
+
+  // Trigger a save to LocalStorage using a noop action
+  storeA.dispatch({ type: NOOP })
+
+  // Store which loads from LocalStorage
+  let storeB = createStore(
+    reducer,
+    load()
+  )
+
+  let testResult = equal(
+    successState,
+    storeB.getState()
+  )
+
+  outputTestResult('test11', testResult)
+}
+
+// -------------------------------------------------------------------------------
 
 // Output result of test in browser
 function outputTestResult (test, testResult) {

@@ -54,13 +54,15 @@ The `save` method takes a optional configuration object as an argument. It has t
 ```
 {
     [Array states],
+    [Array ignoreStates]
     [String namespace],
     [String namespaceSeparator],
     [Number debounce]
 }
 ```
 
-- states (Array, optional) - This is an optional array of strings specifying which parts of the Redux state tree you would like to save to LocalStorage. e.g. ["user", "products"]. Typically states have identical names to your Redux reducers. If you do not specify any states then your entire Redux state tree will be saved to LocalStorage.
+- states (Array, optional) - This is an optional array of strings specifying which parts of the Redux state tree you want to save to LocalStorage. e.g. ["user", "products"]. Typically states have identical names to your Redux reducers. If you do not specify any states then your entire Redux state tree will be saved to LocalStorage.
+- ignoreStates (Array, optional) - This is an optional array of strings specifying which parts of the Redux state tree you do **not** want to save to LocalStorage i.e. ignore. e.g. ["miscUselessInfo1", "miscUselessInfo2"]. Typically states have identical names to your Redux reducers. Unlike the `states` property, `ignoreStates` only works on top-level properties within your state, not nested state as shown in the **Advanced Usage** section below e.g. "miscUselessInfo1" = works, "miscUselessInfo1.innerInfo" = doesn't work.
 - namespace (String, optional) - This is an optional string specifying the namespace to add to your LocalStorage items. For example if you have a part of your Redux state tree called "user" and you specify the namespace "my_cool_app", it will be saved to LocalStorage as "my_cool_app_user"
 - namespaceSeparator (String, optional) - This is an optional string specifying the separator used between the namespace and the state keys. For example with the namespaceSeparator set to "::", the key saved to the LocalStorage would be "my_cool_app::user"
 - debounce (Number, optional) - Debouncing period (in milliseconds) to wait before saving to LocalStorage. Use this as a performance optimization if you feel you are saving to LocalStorage too often. Recommended value: 500 - 1000 milliseconds
@@ -77,6 +79,12 @@ Save specific parts of the state tree.
 
 ```js
 save({ states: ["user", "products"] })
+```
+
+Save entire state tree except the states you want to ignore.
+
+```js
+save({ ignoreStates: ["miscUselessInfo1", "miscUselessInfo2"] })
 ```
 
 Save the entire state tree under the namespace "my_cool_app". The key "my_cool_app" will appear in LocalStorage.
@@ -132,7 +140,7 @@ The `load` method takes a optional configuration object as an argument. It has t
 }
 ```
 
-- states (Array, optional) - This is an optional array of strings specifying which parts of the Redux state tree you would like to load from LocalStorage. e.g. ["user", "products"]. These parts of the state tree must have been previously saved using the `save` method. Typically states have identical names to your Redux reducers. If you do not specify any states then your entire Redux state tree will be loaded from LocalStorage.
+- states (Array, optional) - This is an optional array of strings specifying which parts of the Redux state tree you want to load from LocalStorage. e.g. ["user", "products"]. These parts of the state tree must have been previously saved using the `save` method. Typically states have identical names to your Redux reducers. If you do not specify any states then your entire Redux state tree will be loaded from LocalStorage.
 - namespace (String, optional) - If you have saved your entire state tree or parts of your state tree with a namespace you will need to specify it in order to load it from LocalStorage.
 - namespaceSeparator (String, optional) - If you have saved entire state tree or parts of your state tree with a namespaceSeparator, you will need to specify it in order to load it from LocalStorage.
 - preloadedState (Object, optional) - Passthrough for the `preloadedState` argument in Redux's `createStore` method. See section **Advanced Usage** below.
