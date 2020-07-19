@@ -26,13 +26,15 @@ let debounceTimeout = null
 
 */
 
-function warn (disableWarnings) {
-  return function (warningMessage) {
-    if (!disableWarnings) {
-      console.warn(MODULE_NAME, warningMessage)
-    }
-  }
+function warnConsole (warningMessage) {
+  console.warn(MODULE_NAME, warningMessage)
 }
+
+function warnSilent (_warningMessage) {
+  // Empty
+}
+
+const warn = disableWarnings => (disableWarnings ? warnSilent : warnConsole)
 
 // ---------------------------------------------------
 /* lensPath

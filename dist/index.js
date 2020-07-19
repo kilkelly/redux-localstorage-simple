@@ -45,13 +45,17 @@ var debounceTimeout = null;
 
 */
 
-function warn(disableWarnings) {
-  return function (warningMessage) {
-    if (!disableWarnings) {
-      console.warn(MODULE_NAME, warningMessage);
-    }
-  };
+function warnConsole(warningMessage) {
+  console.warn(MODULE_NAME, warningMessage);
 }
+
+function warnSilent(_warningMessage) {
+  // Empty
+}
+
+var warn = function warn(disableWarnings) {
+  return disableWarnings ? warnSilent : warnConsole;
+};
 
 // ---------------------------------------------------
 /* lensPath
