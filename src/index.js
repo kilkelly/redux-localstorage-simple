@@ -248,12 +248,13 @@ export function save ({
         localStorage[namespace] = JSON.stringify(state_)
       } else {
         states.forEach(state => {
+          const key = namespace + namespaceSeparator + state
           const stateForLocalStorage = getStateForLocalStorage(state, state_)
           if (stateForLocalStorage) {
-            localStorage[namespace + namespaceSeparator + state] = JSON.stringify(stateForLocalStorage)
+            localStorage[key] = JSON.stringify(stateForLocalStorage)
           } else {
             // Make sure nothing is ever saved for this incorrect state
-            localStorage.removeItem(namespace + namespaceSeparator + state)
+            localStorage.removeItem(key)
           }
         })
       }
@@ -339,10 +340,11 @@ export function load ({
     }
   } else { // Load only specified states into the local Redux state tree
     states.forEach(function (state) {
-      if (localStorage.getItem(namespace + namespaceSeparator + state)) {
-        loadedState = objectMerge(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + namespaceSeparator + state])))
+      const key = namespace + namespaceSeparator + state
+      if (localStorage.getItem(key)) {
+        loadedState = objectMerge(loadedState, realiseObject(state, JSON.parse(localStorage[key])))
       } else {
-        warn_("Invalid load '" + (namespace + namespaceSeparator + state) + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.")
+        warn_("Invalid load '" + key + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.")
       }
     })
   }
