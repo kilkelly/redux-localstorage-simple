@@ -274,13 +274,13 @@ function save() {
         // Local function to avoid duplication of code above
         function _save() {
           if (states.length === 0) {
-            localStorage[namespace] = JSON.stringify(state_);
+            localStorage.setItem(namespace, JSON.stringify(state_));
           } else {
             states.forEach(function (state) {
               var key = namespace + namespaceSeparator + state;
               var stateForLocalStorage = getStateForLocalStorage(state, state_);
               if (stateForLocalStorage) {
-                localStorage[key] = JSON.stringify(stateForLocalStorage);
+                localStorage.setItem(key, JSON.stringify(stateForLocalStorage));
               } else {
                 // Make sure nothing is ever saved for this incorrect state
                 localStorage.removeItem(key);
@@ -373,15 +373,15 @@ function load() {
 
   // Load all of the namespaced Redux data from LocalStorage into local Redux state tree
   if (states.length === 0) {
-    if (localStorage[namespace]) {
-      loadedState = JSON.parse(localStorage[namespace]);
+    if (localStorage.getItem(namespace)) {
+      loadedState = JSON.parse(localStorage.getItem(namespace));
     }
   } else {
     // Load only specified states into the local Redux state tree
     states.forEach(function (state) {
       var key = namespace + namespaceSeparator + state;
       if (localStorage.getItem(key)) {
-        loadedState = (0, _objectMerge2.default)(loadedState, realiseObject(state, JSON.parse(localStorage[key])));
+        loadedState = (0, _objectMerge2.default)(loadedState, realiseObject(state, JSON.parse(localStorage.getItem(key))));
       } else {
         warn_("Invalid load '" + key + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.");
       }
@@ -462,7 +462,10 @@ function clear() {
     namespace = NAMESPACE_DEFAULT;
   }
 
-  for (var key in localStorage) {
+  var len = localStorage.length;
+  for (var ind = 0; ind < len; ind++) {
+    var key = localStorage.key(ind);
+
     // key starts with namespace
     if (key.slice(0, namespace.length) === namespace) {
       localStorage.removeItem(key);
