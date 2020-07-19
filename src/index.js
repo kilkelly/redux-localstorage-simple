@@ -198,7 +198,7 @@ export function save ({
 
     // Validate 'namespaceSeparator' parameter
     if (!isString(namespaceSeparator)) {
-      console.error(MODULE_NAME, "'namespaceSeparator' parameter in 'load()' method was passed a non-string value. Setting default value instead. Check your 'load()' method.")
+      console.error(MODULE_NAME, "'namespaceSeparator' parameter in 'save()' method was passed a non-string value. Setting default value instead. Check your 'save()' method.")
       namespaceSeparator = NAMESPACE_SEPARATOR_DEFAULT
     }
 
