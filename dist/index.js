@@ -373,15 +373,17 @@ function load() {
 
   // Load all of the namespaced Redux data from LocalStorage into local Redux state tree
   if (states.length === 0) {
-    if (localStorage.getItem(namespace)) {
-      loadedState = JSON.parse(localStorage.getItem(namespace));
+    var val = localStorage.getItem(namespace);
+    if (val) {
+      loadedState = JSON.parse(val);
     }
   } else {
     // Load only specified states into the local Redux state tree
     states.forEach(function (state) {
       var key = namespace + namespaceSeparator + state;
-      if (localStorage.getItem(key)) {
-        loadedState = (0, _objectMerge2.default)(loadedState, realiseObject(state, JSON.parse(localStorage.getItem(key))));
+      var val = localStorage.getItem(key);
+      if (val) {
+        loadedState = (0, _objectMerge2.default)(loadedState, realiseObject(state, JSON.parse(val)));
       } else {
         warn_("Invalid load '" + key + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.");
       }
