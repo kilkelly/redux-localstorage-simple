@@ -11,14 +11,15 @@ declare module 'redux-localstorage-simple' {
   }
   interface LoadOptions {
     states?: string[];
-    namespace?: string;
     immutablejs?: boolean;
+    namespace?: string;
+    namespaceSeparator?: string;
     preloadedState?: {};
     disableWarnings?: boolean;
   }
   interface ClearOptions {
     namespace?: string;
-  }  
+  }
   export function save(options?:RLSOptions):Middleware
   export function load(options?:LoadOptions):object
   export function clear(options?:ClearOptions):void
