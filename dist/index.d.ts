@@ -8,6 +8,7 @@ declare module 'redux-localstorage-simple' {
     namespace?: string;
     namespaceSeparator?: string;
     debounce?: number;
+    disableWarnings?: boolean;
   }
   interface LoadOptions {
     states?: string[];
@@ -18,7 +19,8 @@ declare module 'redux-localstorage-simple' {
   }
   interface ClearOptions {
     namespace?: string;
-  }  
+    disableWarnings?: boolean;
+  }
   export function save(options?:RLSOptions):Middleware
   export function load(options?:LoadOptions):object
   export function clear(options?:ClearOptions):void

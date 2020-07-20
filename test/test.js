@@ -1850,6 +1850,61 @@
 	}
 
 	// ---------------------------------------------------
+	// SafeLocalStorage wrapper to handle the minefield of exceptions
+	// that localStorage can throw. JSON.parse() is handled here as well.
+
+	function SafeLocalStorage(warnFn) {
+	  this.warnFn = warnFn || warnConsole;
+	}
+
+	Object.defineProperty(SafeLocalStorage.prototype, 'length', {
+	  get: function length() {
+	    try {
+	      return localStorage.length;
+	    } catch (err) {
+	      this.warnFn(err);
+	    }
+	    return 0;
+	  },
+	  configurable: true,
+	  enumerable: true
+	});
+
+	SafeLocalStorage.prototype.key = function key(ind) {
+	  try {
+	    return localStorage.key(ind);
+	  } catch (err) {
+	    this.warnFn(err);
+	  }
+	  return null;
+	};
+
+	SafeLocalStorage.prototype.setItem = function setItem(key, val) {
+	  try {
+	    localStorage.setItem(key, JSON.stringify(val));
+	  } catch (err) {
+	    this.warnFn(err);
+	  }
+	};
+
+	SafeLocalStorage.prototype.getItem = function getItem(key) {
+	  try {
+	    return JSON.parse(localStorage.getItem(key));
+	  } catch (err) {
+	    this.warnFn(err);
+	  }
+	  return null;
+	};
+
+	SafeLocalStorage.prototype.removeItem = function removeItem(key) {
+	  try {
+	    localStorage.removeItem(key);
+	  } catch (err) {
+	    this.warnFn(err);
+	  }
+	};
+
+	// ---------------------------------------------------
 
 	/**
 	  Saves specified parts of the Redux state tree into localstorage
@@ -1907,11 +1962,16 @@
 	      _ref$namespaceSeparat = _ref.namespaceSeparator,
 	      namespaceSeparator = _ref$namespaceSeparat === undefined ? NAMESPACE_SEPARATOR_DEFAULT : _ref$namespaceSeparat,
 	      _ref$debounce = _ref.debounce,
-	      debounce = _ref$debounce === undefined ? DEBOUNCE_DEFAULT : _ref$debounce;
+	      debounce = _ref$debounce === undefined ? DEBOUNCE_DEFAULT : _ref$debounce,
+	      _ref$disableWarnings = _ref.disableWarnings,
+	      disableWarnings = _ref$disableWarnings === undefined ? DISABLE_WARNINGS_DEFAULT : _ref$disableWarnings;
 
 	  return function (store) {
 	    return function (next) {
 	      return function (action) {
+	        // Bake disableWarnings into the warn function
+	        var warn_ = warn(disableWarnings);
+
 	        var returnValue = next(action);
 	        var state_ = void 0;
 
@@ -1963,6 +2023,8 @@
 	          state_ = store.getState();
 	        }
 
+	        var storage = new SafeLocalStorage(warn_);
+
 	        // Check to see whether to debounce LocalStorage saving
 	        if (debounce) {
 	          // Clear the debounce timeout if it was previously set
@@ -1993,16 +2055,16 @@
 	        // Local function to avoid duplication of code above
 	        function _save() {
 	          if (states.length === 0) {
-	            localStorage.setItem(namespace, JSON.stringify(state_));
+	            storage.setItem(namespace, state_);
 	          } else {
 	            states.forEach(function (state) {
 	              var key = namespace + namespaceSeparator + state;
 	              var stateForLocalStorage = getStateForLocalStorage(state, state_);
 	              if (stateForLocalStorage) {
-	                localStorage.setItem(key, JSON.stringify(stateForLocalStorage));
+	                storage.setItem(key, stateForLocalStorage);
 	              } else {
 	                // Make sure nothing is ever saved for this incorrect state
-	                localStorage.removeItem(key);
+	                storage.removeItem(key);
 	              }
 	            });
 	          }
@@ -2088,21 +2150,23 @@
 	    warn_('Support for Immutable.js data structures has been deprecated as of version 2.0.0. Please use version 1.4.0 if you require this functionality.');
 	  }
 
+	  var storage = new SafeLocalStorage(warn_);
+
 	  var loadedState = preloadedState;
 
 	  // Load all of the namespaced Redux data from LocalStorage into local Redux state tree
 	  if (states.length === 0) {
-	    var val = localStorage.getItem(namespace);
+	    var val = storage.getItem(namespace);
 	    if (val) {
-	      loadedState = JSON.parse(val);
+	      loadedState = val;
 	    }
 	  } else {
 	    // Load only specified states into the local Redux state tree
 	    states.forEach(function (state) {
 	      var key = namespace + namespaceSeparator + state;
-	      var val = localStorage.getItem(key);
+	      var val = storage.getItem(key);
 	      if (val) {
-	        loadedState = (0, _objectMerge2.default)(loadedState, realiseObject(state, JSON.parse(val)));
+	        loadedState = (0, _objectMerge2.default)(loadedState, realiseObject(state, val));
 	      } else {
 	        warn_("Invalid load '" + key + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.");
 	      }
@@ -2175,7 +2239,12 @@
 	function clear() {
 	  var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
 	      _ref3$namespace = _ref3.namespace,
-	      namespace = _ref3$namespace === undefined ? NAMESPACE_DEFAULT : _ref3$namespace;
+	      namespace = _ref3$namespace === undefined ? NAMESPACE_DEFAULT : _ref3$namespace,
+	      _ref3$disableWarnings = _ref3.disableWarnings,
+	      disableWarnings = _ref3$disableWarnings === undefined ? DISABLE_WARNINGS_DEFAULT : _ref3$disableWarnings;
+
+	  // Bake disableWarnings into the warn function
+	  var warn_ = warn(disableWarnings);
 
 	  // Validate 'namespace' parameter
 	  if (!isString(namespace)) {
@@ -2183,13 +2252,15 @@
 	    namespace = NAMESPACE_DEFAULT;
 	  }
 
-	  var len = localStorage.length;
+	  var storage = new SafeLocalStorage(warn_);
+
+	  var len = storage.length;
 	  for (var ind = 0; ind < len; ind++) {
-	    var key = localStorage.key(ind);
+	    var key = storage.key(ind);
 
 	    // key starts with namespace
-	    if (key.slice(0, namespace.length) === namespace) {
-	      localStorage.removeItem(key);
+	    if (key && key.slice(0, namespace.length) === namespace) {
+	      storage.removeItem(key);
 	    }
 	  }
 	}
