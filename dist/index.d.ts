@@ -12,8 +12,9 @@ declare module 'redux-localstorage-simple' {
   }
   interface LoadOptions {
     states?: string[];
-    namespace?: string;
     immutablejs?: boolean;
+    namespace?: string;
+    namespaceSeparator?: string;
     preloadedState?: {};
     disableWarnings?: boolean;
   }
