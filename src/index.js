@@ -26,13 +26,15 @@ let debounceTimeout = null
 
 */
 
-function warn (disableWarnings) {
-  return function (warningMessage) {
-    if (!disableWarnings) {
-      console.warn(MODULE_NAME, warningMessage)
-    }
-  }
+function warnConsole (warningMessage) {
+  console.warn(MODULE_NAME, warningMessage)
 }
+
+function warnSilent (_warningMessage) {
+  // Empty
+}
+
+const warn = disableWarnings => (disableWarnings ? warnSilent : warnConsole)
 
 // ---------------------------------------------------
 /* lensPath
@@ -110,6 +112,61 @@ function realiseObject (objectPath, objectInitialValue = {}) {
 }
 
 // ---------------------------------------------------
+// SafeLocalStorage wrapper to handle the minefield of exceptions
+// that localStorage can throw. JSON.parse() is handled here as well.
+
+function SafeLocalStorage (warnFn) {
+  this.warnFn = warnFn || warnConsole
+}
+
+Object.defineProperty(SafeLocalStorage.prototype, 'length', {
+  get: function length () {
+    try {
+      return localStorage.length
+    } catch (err) {
+      this.warnFn(err)
+    }
+    return 0
+  },
+  configurable: true,
+  enumerable: true
+});
+
+SafeLocalStorage.prototype.key = function key (ind) {
+  try {
+    return localStorage.key(ind)
+  } catch (err) {
+    this.warnFn(err)
+  }
+  return null
+}
+
+SafeLocalStorage.prototype.setItem = function setItem (key, val) {
+  try {
+    localStorage.setItem(key, JSON.stringify(val))
+  } catch (err) {
+    this.warnFn(err)
+  }
+}
+
+SafeLocalStorage.prototype.getItem = function getItem (key) {
+  try {
+    return JSON.parse(localStorage.getItem(key))
+  } catch (err) {
+    this.warnFn(err)
+  }
+  return null
+}
+
+SafeLocalStorage.prototype.removeItem = function removeItem (key) {
+  try {
+    localStorage.removeItem(key)
+  } catch (err) {
+    this.warnFn(err)
+  }
+}
+
+// ---------------------------------------------------
 
 /**
   Saves specified parts of the Redux state tree into localstorage
@@ -161,9 +218,13 @@ export function save ({
       ignoreStates = IGNORE_STATES_DEFAULT,
       namespace = NAMESPACE_DEFAULT,
       namespaceSeparator = NAMESPACE_SEPARATOR_DEFAULT,
-      debounce = DEBOUNCE_DEFAULT
+      debounce = DEBOUNCE_DEFAULT,
+      disableWarnings = DISABLE_WARNINGS_DEFAULT
     } = {}) {
   return store => next => action => {
+    // Bake disableWarnings into the warn function
+    const warn_ = warn(disableWarnings)
+
     const returnValue = next(action)
     let state_
 
@@ -215,6 +276,8 @@ export function save ({
       state_= store.getState()
     }
 
+    const storage = new SafeLocalStorage(warn_)
+
     // Check to see whether to debounce LocalStorage saving
     if (debounce) {
       // Clear the debounce timeout if it was previously set
@@ -245,15 +308,16 @@ export function save ({
     // Local function to avoid duplication of code above
     function _save () {
       if (states.length === 0) {
-        localStorage[namespace] = JSON.stringify(state_)
+        storage.setItem(namespace, state_)
       } else {
         states.forEach(state => {
+          const key = namespace + namespaceSeparator + state
           const stateForLocalStorage = getStateForLocalStorage(state, state_)
           if (stateForLocalStorage) {
-            localStorage[namespace + namespaceSeparator + state] = JSON.stringify(stateForLocalStorage)
+            storage.setItem(key, stateForLocalStorage)
           } else {
             // Make sure nothing is ever saved for this incorrect state
-            localStorage.removeItem(namespace + namespaceSeparator + state)
+            storage.removeItem(key)
           }
         })
       }
@@ -330,19 +394,24 @@ export function load ({
     warn_('Support for Immutable.js data structures has been deprecated as of version 2.0.0. Please use version 1.4.0 if you require this functionality.')
   }
 
+  const storage = new SafeLocalStorage(warn_)
+
   let loadedState = preloadedState
 
   // Load all of the namespaced Redux data from LocalStorage into local Redux state tree
   if (states.length === 0) {
-    if (localStorage[namespace]) {
-      loadedState = JSON.parse(localStorage[namespace])
+    const val = storage.getItem(namespace)
+    if (val) {
+      loadedState = val
     }
   } else { // Load only specified states into the local Redux state tree
     states.forEach(function (state) {
-      if (localStorage.getItem(namespace + namespaceSeparator + state)) {
-        loadedState = objectMerge(loadedState, realiseObject(state, JSON.parse(localStorage[namespace + namespaceSeparator + state])))
+      const key = namespace + namespaceSeparator + state
+      const val = storage.getItem(key)
+      if (val) {
+        loadedState = objectMerge(loadedState, realiseObject(state, val))
       } else {
-        warn_("Invalid load '" + (namespace + namespaceSeparator + state) + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.")
+        warn_("Invalid load '" + key + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.")
       }
     })
   }
@@ -406,17 +475,28 @@ export function combineLoads (...loads) {
     })
 */
 
-export function clear ({ namespace = NAMESPACE_DEFAULT } = {}) {
+export function clear ({
+  namespace = NAMESPACE_DEFAULT,
+  disableWarnings = DISABLE_WARNINGS_DEFAULT
+} = {}) {
+  // Bake disableWarnings into the warn function
+  const warn_ = warn(disableWarnings)
+
   // Validate 'namespace' parameter
   if (!isString(namespace)) {
     console.error(MODULE_NAME, "'namespace' parameter in 'clear()' method was passed a non-string value. Setting default value instead. Check your 'clear()' method.")
     namespace = NAMESPACE_DEFAULT
   }
 
-  for (let key in localStorage) {
+  const storage = new SafeLocalStorage(warn_)
+
+  const len = storage.length
+  for (let ind = 0; ind < len; ind++) {
+    const key = storage.key(ind)
+
     // key starts with namespace
-    if (key.slice(0, namespace.length) === namespace) {
-      localStorage.removeItem(key)
+    if (key && key.slice(0, namespace.length) === namespace) {
+      storage.removeItem(key)
     }
   }
 }

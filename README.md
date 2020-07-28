@@ -57,7 +57,8 @@ The `save` method takes a optional configuration object as an argument. It has t
     [Array ignoreStates]
     [String namespace],
     [String namespaceSeparator],
-    [Number debounce]
+    [Number debounce],
+    [Boolean disableWarnings]
 }
 ```
 
@@ -66,6 +67,7 @@ The `save` method takes a optional configuration object as an argument. It has t
 - namespace (String, optional) - This is an optional string specifying the namespace to add to your LocalStorage items. For example if you have a part of your Redux state tree called "user" and you specify the namespace "my_cool_app", it will be saved to LocalStorage as "my_cool_app_user"
 - namespaceSeparator (String, optional) - This is an optional string specifying the separator used between the namespace and the state keys. For example with the namespaceSeparator set to "::", the key saved to the LocalStorage would be "my_cool_app::user"
 - debounce (Number, optional) - Debouncing period (in milliseconds) to wait before saving to LocalStorage. Use this as a performance optimization if you feel you are saving to LocalStorage too often. Recommended value: 500 - 1000 milliseconds
+- disableWarnings (Boolean, optional) - Any exceptions thrown by LocalStorage will be logged as warnings in the JavaScript console by default, but can be silenced by setting `disableWarnings` to true.
 
 #### Examples
 
@@ -144,7 +146,7 @@ The `load` method takes a optional configuration object as an argument. It has t
 - namespace (String, optional) - If you have saved your entire state tree or parts of your state tree with a namespace you will need to specify it in order to load it from LocalStorage.
 - namespaceSeparator (String, optional) - If you have saved entire state tree or parts of your state tree with a namespaceSeparator, you will need to specify it in order to load it from LocalStorage.
 - preloadedState (Object, optional) - Passthrough for the `preloadedState` argument in Redux's `createStore` method. See section **Advanced Usage** below.
-- disableWarnings (Boolean, optional) - When you first try to a load a state from LocalStorage you will see a warning in the JavaScript console informing you that this state load is invalid. This is because the `save` method hasn't been called yet and this state has yet to been written to LocalStorage. You may not care to see this warning so to disable it set `disableWarnings` to true.
+- disableWarnings (Boolean, optional) - When you first try to a load a state from LocalStorage you will see a warning in the JavaScript console informing you that this state load is invalid. This is because the `save` method hasn't been called yet and this state has yet to been written to LocalStorage. You may not care to see this warning so to disable it set `disableWarnings` to true. Any exceptions thrown by LocalStorage will also be logged as warnings by default, but can be silenced by setting `disableWarnings` to true.
 
 #### Examples
 
@@ -221,11 +223,13 @@ The `clear` method takes a optional configuration object as an argument. It has 
 
 ```
 {
-    [String namespace]
+    [String namespace],
+    [Boolean disableWarnings]
 }
 ```
 
 - namespace - If you have saved your entire state tree or parts of your state tree under a namespace you will need to specify it in order to clear that data from LocalStorage.
+- disableWarnings (Boolean, optional) - Any exceptions thrown by LocalStorage will be logged as warnings in the JavaScript console by default, but can be silenced by setting `disableWarnings` to true.
 
 #### Examples
 
