@@ -2,6 +2,8 @@
 
 module.exports = {
 
+  mode: 'production',
+
   entry: {
     test: [
       './test/test_.js'
@@ -9,10 +11,10 @@ module.exports = {
   },
 
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js?/,
-        loader: 'babel',
+        use: 'babel-loader',
         exclude: /node_modules/
       }
     ]
@@ -21,7 +23,8 @@ module.exports = {
   output: {
     // library: 'redux-localstorage-simple',
     // libraryTarget: 'umd',
-    filename: './test/[name].js'
+    filename: '[name].js',
+    path: __dirname
   }
 
 }
