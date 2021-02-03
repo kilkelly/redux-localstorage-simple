@@ -34,7 +34,7 @@
     "@babel/preset-env": "7.10.4",
     "babel-loader": "8.1.0",
     "babel-preset-minify": "0.5.1",
-    "deep-equal": "2.0.3",
+    "deep-equal": "2.0.5",
     "redux": "4.0.5",
     "rimraf": "3.0.2",
     "webpack": "^4.44.0",
