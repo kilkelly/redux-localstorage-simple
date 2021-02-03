@@ -1,6 +1,6 @@
 'use strict'
 
-import objectMerge from 'object-merge'
+import merge from 'merge'
 
 const MODULE_NAME = '[Redux-LocalStorage-Simple]'
 const NAMESPACE_DEFAULT = 'redux_localstorage_simple'
@@ -409,7 +409,7 @@ export function load ({
       const key = namespace + namespaceSeparator + state
       const val = storage.getItem(key)
       if (val) {
-        loadedState = objectMerge(loadedState, realiseObject(state, val))
+        loadedState = merge.recursive(loadedState, realiseObject(state, val))
       } else {
         warn_("Invalid load '" + key + "' provided. Check your 'states' in 'load()'. If this is your first time running this app you may see this message. To disable it in future use the 'disableWarnings' flag, see documentation.")
       }
