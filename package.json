@@ -1,7 +1,7 @@
 {
-  "name": "redux-localstorage-simple",
-  "version": "2.4.0",
-  "description": "Save and load Redux state to and from LocalStorage.",
+  "name": "redux-localstorage-simple-metalab",
+  "version": "2.4.1",
+  "description": "Temporary fork of `redux-localstorage-simple` to handle subdep vulnerability",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kilkelly/redux-localstorage-simple.git"
+    "url": "git+https://github.com/metalabdesign/redux-localstorage-simple.git",
   },
   "keywords": [
     "redux",
@@ -21,10 +21,7 @@
   ],
   "author": "Frank Kilkelly",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/kilkelly/redux-localstorage-simple/issues"
-  },
-  "homepage": "https://github.com/kilkelly/redux-localstorage-simple#readme",
+  "homepage": "https://github.com/metalabdesign/redux-localstorage-simple",
   "dependencies": {
     "merge": "2.1.1"
   },
