@@ -1,6 +1,6 @@
 {
-  "name": "redux-localstorage-simple-metalab",
-  "version": "2.4.2",
+  "name": "redux-localstorage-simple",
+  "version": "2.4.0",
   "description": "Temporary fork of `redux-localstorage-simple` to handle subdep vulnerability",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
