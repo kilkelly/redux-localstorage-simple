@@ -10,7 +10,7 @@ const IGNORE_STATES_DEFAULT = []
 const DEBOUNCE_DEFAULT = 0
 const IMMUTABLEJS_DEFAULT = false
 const DISABLE_WARNINGS_DEFAULT = false
-let debounceTimeout = null
+let debounceTimeouts = new Map()
 
 // ---------------------------------------------------
 /* warn
@@ -281,14 +281,17 @@ export function save ({
     // Check to see whether to debounce LocalStorage saving
     if (debounce) {
       // Clear the debounce timeout if it was previously set
-      if (debounceTimeout) {
-        clearTimeout(debounceTimeout)
+      if (debounceTimeouts.get(states + namespace)) {
+        clearTimeout(debounceTimeouts.get(states + namespace))
       }
 
       // Save to LocalStorage after the debounce period has elapsed
-      debounceTimeout = setTimeout(function () {
-        _save(states, namespace)
-      }, debounce)
+      debounceTimeouts.set(
+        states + namespace,
+        setTimeout(function () {
+          _save(states, namespace)
+        }, debounce)        
+      ) 
     // No debouncing necessary so save to LocalStorage right now
     } else {
       _save(states, namespace)
