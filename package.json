@@ -1,6 +1,6 @@
 {
   "name": "redux-localstorage-simple",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "description": "Save and load Redux state to and from LocalStorage.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
