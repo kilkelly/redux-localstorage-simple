@@ -1,7 +1,7 @@
 'use strict'
 
-import { createStore, applyMiddleware, combineReducers } from 'redux'
-import { save, load, combineLoads, clear } from '../src/index' // redux-localstorage-simple dist
+import { legacy_createStore, applyMiddleware, combineReducers } from 'redux'
+import { save, load, clear } from '../src/index' // redux-localstorage-simple dist
 import equal from 'deep-equal'
 
 const NAMESPACE_DEFAULT = 'redux_localstorage_simple'
@@ -111,7 +111,7 @@ clearTestData()
   let middleware = save()
 
   // Store which saves to LocalStorage
-  let storeA = applyMiddleware(middleware)(createStore)(
+  let storeA = applyMiddleware(middleware)(legacy_createStore)(
     combineReducers({ reducerA, reducerB }),
     initialStateReducers
   )
@@ -120,7 +120,7 @@ clearTestData()
   storeA.dispatch({ type: NOOP })
 
   // Store which loads from LocalStorage
-  let storeB = createStore(
+  let storeB = legacy_createStore(
     combineReducers({ reducerA, reducerB }),
     load()
   )
@@ -142,7 +142,7 @@ clearTestData()
   let middleware = save({ states: ['reducerA'] })
 
   // Store which saves to LocalStorage
-  let storeA = applyMiddleware(middleware)(createStore)(
+  let storeA = applyMiddleware(middleware)(legacy_createStore)(
     combineReducers({ reducerA, reducerB }),
     initialStateReducers
   )
@@ -151,7 +151,7 @@ clearTestData()
   storeA.dispatch({ type: APPEND })
 
   // Store which loads from LocalStorage
-  let storeB = createStore(
+  let storeB = legacy_createStore(
     combineReducers({ reducerA, reducerB }),
     load({ states: ['reducerA'] })
   )
@@ -173,7 +173,7 @@ clearTestData()
   let middleware = save({ namespace: NAMESPACE_TEST })
 
   // Store which saves to LocalStorage
-  let storeA = applyMiddleware(middleware)(createStore)(
+  let storeA = applyMiddleware(middleware)(legacy_createStore)(
     combineReducers({ reducerA, reducerB }),
     initialStateReducers
   )
@@ -182,7 +182,7 @@ clearTestData()
   storeA.dispatch({ type: NOOP })
 
   // Store which loads from LocalStorage
-  let storeB = createStore(
+  let storeB = legacy_createStore(
     combineReducers({ reducerA, reducerB }),
     load({ namespace: NAMESPACE_TEST })
   )
@@ -204,7 +204,7 @@ clearTestData()
   let middleware = save({ states: ['reducerA'], namespace: NAMESPACE_TEST })
 
   // Store which saves to LocalStorage
-  let storeA = applyMiddleware(middleware)(createStore)(
+  let storeA = applyMiddleware(middleware)(legacy_createStore)(
     combineReducers({ reducerA, reducerB }),
     initialStateReducers
   )
@@ -213,7 +213,7 @@ clearTestData()
   storeA.dispatch({ type: APPEND })
 
   // Store which loads from LocalStorage
-  let storeB = createStore(
+  let storeB = legacy_createStore(
     combineReducers({ reducerA, reducerB }),
     load({ states: ['reducerA'], namespace: NAMESPACE_TEST })
   )
@@ -235,7 +235,7 @@ clearTestData()
   let middleware = save({ namespace: NAMESPACE_TEST, namespaceSeparator: NAMESPACE_SEPARATOR_TEST })
 
   // Store which saves to LocalStorage
-  let storeA = applyMiddleware(middleware)(createStore)(
+  let storeA = applyMiddleware(middleware)(legacy_createStore)(
     combineReducers({ reducerA, reducerB }),
     initialStateReducers
   )
@@ -244,7 +244,7 @@ clearTestData()
   storeA.dispatch({ type: NOOP })
 
   // Store which loads from LocalStorage
-  let storeB = createStore(
+  let storeB = legacy_createStore(
     combineReducers({ reducerA, reducerB }),
     load({ namespace: NAMESPACE_TEST, namespaceSeparator: NAMESPACE_SEPARATOR_TEST })
   )
@@ -266,7 +266,7 @@ clearTestData()
   let middleware = save({ states: ['reducerA'], namespace: NAMESPACE_TEST, namespaceSeparator: NAMESPACE_SEPARATOR_TEST })
 
   // Store which saves to LocalStorage
-  let storeA = applyMiddleware(middleware)(createStore)(
+  let storeA = applyMiddleware(middleware)(legacy_createStore)(
     combineReducers({ reducerA, reducerB }),
     initialStateReducers
   )
@@ -275,7 +275,7 @@ clearTestData()
   storeA.dispatch({ type: APPEND })
 
   // Store which loads from LocalStorage
-  let storeB = createStore(
+  let storeB = legacy_createStore(
     combineReducers({ reducerA, reducerB }),
     load({ states: ['reducerA'], namespace: NAMESPACE_TEST, namespaceSeparator: NAMESPACE_SEPARATOR_TEST })
   )
@@ -295,12 +295,12 @@ clearTestData()
 
 {
   // Store that saves without a namespace
-  let storeA = applyMiddleware(save())(createStore)(reducerA, initialStateReducerA)
+  let storeA = applyMiddleware(save())(legacy_createStore)(reducerA, initialStateReducerA)
   // Trigger a save to LocalStorage using a noop action
   storeA.dispatch({ type: NOOP })
 
   // Store that saves WITH a namespace
-  let storeB = applyMiddleware(save({ namespace: NAMESPACE_TEST }))(createStore)(reducerA, initialStateReducerA)
+  let storeB = applyMiddleware(save({ namespace: NAMESPACE_TEST }))(legacy_createStore)(reducerA, initialStateReducerA)
   // Trigger a save to LocalStorage using a noop action
   storeB.dispatch({ type: NOOP })
 
@@ -324,12 +324,12 @@ clearTestData()
 
 {
   // Store that saves without a namespace
-  let storeA = applyMiddleware(save())(createStore)(reducerA, initialStateReducerA)
+  let storeA = applyMiddleware(save())(legacy_createStore)(reducerA, initialStateReducerA)
   // Trigger a save to LocalStorage using a noop action
   storeA.dispatch({ type: NOOP })
 
   // Store that saves WITH a namespace
-  let storeB = applyMiddleware(save({ namespace: NAMESPACE_TEST }))(createStore)(reducerA, initialStateReducerA)
+  let storeB = applyMiddleware(save({ namespace: NAMESPACE_TEST }))(legacy_createStore)(reducerA, initialStateReducerA)
   // Trigger a save to LocalStorage using a noop action
   storeB.dispatch({ type: NOOP })
 
@@ -356,12 +356,12 @@ clearTestData()
   let debouncingPeriod = 500
 
   // Store that saves with a debouncing period
-  let storeA = applyMiddleware(save({debounce: debouncingPeriod}))(createStore)(reducerB, initialStateReducerB)
+  let storeA = applyMiddleware(save({debounce: debouncingPeriod}))(legacy_createStore)(reducerB, initialStateReducerB)
   // Trigger a save to LocalStorage using an add action
   storeA.dispatch({ type: ADD })
 
   // Store which loads from LocalStorage
-  let storeB = createStore(reducerB, load())
+  let storeB = legacy_createStore(reducerB, load())
   // This test result should fail because the debouncing period has
   // delayed the data being written to LocalStorage
   let testResult = storeB.getState()['y'] === 1
@@ -372,7 +372,7 @@ clearTestData()
   // LocalStorage dataand the test should pass
   setTimeout(function () {
     // Store which loads from LocalStorage
-    let storeC = createStore(reducerB, load())
+    let storeC = legacy_createStore(reducerB, load())
     let testResult = storeC.getState()['y'] === 1
     outputTestResult('test9', testResult)
 
@@ -396,7 +396,7 @@ clearTestData()
   let middleware = save({ states: states, namespace: NAMESPACE_TEST })
 
   // Store which saves to LocalStorage
-  let storeA = applyMiddleware(middleware)(createStore)(
+  let storeA = applyMiddleware(middleware)(legacy_createStore)(
     combineReducers({ reducerMultipleLevels }),
     initialStateReducersPlusMultipleLevels
   )
@@ -404,7 +404,7 @@ clearTestData()
   storeA.dispatch({ type: MODIFY })
 
   // Store which loads from LocalStorage
-  let storeB = createStore(
+  let storeB = legacy_createStore(
     combineReducers({ reducerMultipleLevels }),
     load({
       states: states,
@@ -450,13 +450,13 @@ clearTestData()
   let middleware = save({ ignoreStates: ['z1', 'z3'] })
 
   // Store which saves to LocalStorage
-  let storeA = applyMiddleware(middleware)(createStore)(reducer)
+  let storeA = applyMiddleware(middleware)(legacy_createStore)(reducer)
 
   // Trigger a save to LocalStorage using a noop action
   storeA.dispatch({ type: NOOP })
 
   // Store which loads from LocalStorage
-  let storeB = createStore(
+  let storeB = legacy_createStore(
     reducer,
     load()
   )
